@@ -1,0 +1,14 @@
+name: Hello World Workflow
+
+on: push # event
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest # runner
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4 # official action to get code
+
+      - name: Print a message
+        run: echo "Hello from GitHub Actions!"
