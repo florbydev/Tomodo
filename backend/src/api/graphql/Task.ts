@@ -1,4 +1,5 @@
-import { objectType } from "nexus";
+import { DateTimeResolver } from "graphql-scalars";
+import { asNexusMethod, list, nonNull, objectType, queryField } from "nexus";
 
 // TaskType
 // - id
@@ -12,11 +13,13 @@ import { objectType } from "nexus";
 // - completed
 // - completedAt
 
+export const DateTime = asNexusMethod(DateTimeResolver, "date");
+
 export const TaskType = objectType({
   name: "Task",
   definition(t) {
     t.nonNull.id("id"),
-      t.nonNull.id("projectID"),
+      t.nonNull.id("projectId"),
       t.nonNull.string("description"),
       t.int("estimatedCount"),
       t.int("currentCount"),
@@ -26,6 +29,30 @@ export const TaskType = objectType({
       t.boolean("is_checked"),
       t.boolean("completed");
   },
+});
+
+export const TaskQuery = queryField((t) => {
+  t.field("activeTask", {
+    type: list("Task"),
+    async resolve(_parent, _args, ctx) {
+      return ctx.db
+        .selectFrom("tasks")
+        .select([
+          "id",
+          "description",
+          "estimatedCount",
+          "currentCount",
+          "createdAt",
+          "updatedAt",
+          "is_checked",
+          "completed",
+          "completedAt",
+          "projectId",
+        ])
+        .where("completed", "=", false)
+        .execute();
+    },
+  });
 });
 
 // - create task

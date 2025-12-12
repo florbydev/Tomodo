@@ -4,6 +4,7 @@
  */
 
 
+import type { GraphQLContext } from "./src/api/context"
 import type { core } from "nexus"
 declare global {
   interface NexusGenCustomInputMethods<TypeName extends string> {
@@ -28,20 +29,10 @@ declare global {
 }
 
 export interface NexusGenInputs {
-  CreatePostInputType: { // input type
-    authorId: string; // ID!
-    body: string; // String!
-    title: string; // String!
-  }
-  PostsInputType: { // input type
-    published?: boolean | null; // Boolean
-    search?: string | null; // String
-  }
 }
 
 export interface NexusGenEnums {
-  RoleEnum: "DEVELOPER" | "JUDGE" | "ORGANIZER"
-  TaskStatus: "COMPLETED" | "IN_PROGRESS" | "NOT_STARTED" | "OVERACHIEVED"
+  SessionStatus: "END" | "PAUSE" | "PLAY" | "RUNNING"
 }
 
 export interface NexusGenScalars {
@@ -54,73 +45,63 @@ export interface NexusGenScalars {
 }
 
 export interface NexusGenObjects {
-  Cart: { // root type
+  MusicTrack: { // root type
+    artistName: string; // String!
+    audioUrl: string; // String!
+    coverImageUrl: string; // String!
+    durationSeconds: number; // Int!
     id: string; // ID!
-    totalPrice: number; // Float!
-  }
-  CartItem: { // root type
-    quantity: number; // Int!
-  }
-  Challenge: { // root type
-    description?: string | null; // String
-    endAt: NexusGenScalars['DateTime']; // DateTime!
-    id: string; // ID!
-    requiredStack: string[]; // [String!]!
-    startAt: NexusGenScalars['DateTime']; // DateTime!
+    isLoopable?: boolean | null; // Boolean
     title: string; // String!
   }
-  Comment: { // root type
-    body: string; // String!
-    id: string; // ID!
-  }
-  Feedback: { // root type
-    author: NexusGenRootTypes['UserChallenge']; // UserChallenge!
-    body?: string | null; // String
+  Project: { // root type
+    color: string; // String!
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    id: string; // ID!
-    rating?: number | null; // Int
-  }
-  Mutation: {};
-  Post: { // root type
-    body: string; // String!
-    id: string; // ID!
-    published: boolean; // Boolean!
-    title: string; // String!
-  }
-  Product: { // root type
     description: string; // String!
     id: string; // ID!
-    inStock?: boolean | null; // Boolean
     name: string; // String!
-    price: number; // Int!
-    tags: string[]; // [String!]!
+    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    userId: string; // ID!
   }
   Query: {};
-  Submission: { // root type
-    id: string; // ID!
-    projectUrl: string; // String!
-    score?: number | null; // Int
+  Session: { // root type
+    actualBreakTime: number; // Int!
+    actualFocusTime: number; // Int!
+    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    endedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    pausedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    sessionBreakTime: number; // Int!
+    sessionCount: number; // Int!
+    sessionFocusTime: number; // Int!
+    sessionStatus: NexusGenEnums['SessionStatus']; // SessionStatus!
+    userId: string; // ID!
   }
   Task: { // root type
-    actualPomodoros: number; // Int!
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    estimatedPomodoros: number; // Int!
+    completed?: boolean | null; // Boolean
+    completedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    currentCount?: number | null; // Int
+    description: string; // String!
+    estimatedCount?: number | null; // Int
     id: string; // ID!
-    isActive: boolean; // Boolean!
-    isChecked: boolean; // Boolean!
-    listName: string; // String!
-    title: string; // String!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    is_checked?: boolean | null; // Boolean
+    projectId: string; // ID!
+    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
   User: { // root type
+    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
     email: string; // String!
     id: string; // ID!
     name: string; // String!
+    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
-  UserChallenge: { // root type
-    id?: string | null; // ID
-    role: NexusGenEnums['RoleEnum']; // RoleEnum!
-    username?: string | null; // String
+  UserPrefs: { // root type
+    breakTime: number; // Int!
+    darkMode: boolean; // Boolean!
+    focusTime: number; // Int!
+    longBreakInterval: number; // Int!
+    longBreakTime: number; // Int!
+    userId: string; // ID!
   }
 }
 
@@ -135,276 +116,132 @@ export type NexusGenRootTypes = NexusGenObjects
 export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
 
 export interface NexusGenFieldTypes {
-  Cart: { // field return type
+  MusicTrack: { // field return type
+    artistName: string; // String!
+    audioUrl: string; // String!
+    coverImageUrl: string; // String!
+    durationSeconds: number; // Int!
     id: string; // ID!
-    items: NexusGenRootTypes['CartItem'][]; // [CartItem!]!
-    totalPrice: number; // Float!
-  }
-  CartItem: { // field return type
-    product: NexusGenRootTypes['Product'] | null; // Product
-    quantity: number; // Int!
-  }
-  Challenge: { // field return type
-    description: string | null; // String
-    endAt: NexusGenScalars['DateTime']; // DateTime!
-    id: string; // ID!
-    requiredStack: string[]; // [String!]!
-    startAt: NexusGenScalars['DateTime']; // DateTime!
-    submissions: NexusGenRootTypes['Submission'][]; // [Submission!]!
+    isLoopable: boolean | null; // Boolean
     title: string; // String!
   }
-  Comment: { // field return type
-    author: NexusGenRootTypes['User']; // User!
-    body: string; // String!
-    id: string; // ID!
-    post: NexusGenRootTypes['Post']; // Post!
-  }
-  Feedback: { // field return type
-    author: NexusGenRootTypes['UserChallenge']; // UserChallenge!
-    body: string | null; // String
+  Project: { // field return type
+    color: string; // String!
     createdAt: NexusGenScalars['DateTime'] | null; // DateTime
-    id: string; // ID!
-    rating: number | null; // Int
-  }
-  Mutation: { // field return type
-    addComment: NexusGenRootTypes['Comment']; // Comment!
-    addItemToCart: NexusGenRootTypes['Cart']; // Cart!
-    createCart: NexusGenRootTypes['Cart']; // Cart!
-    createPost: NexusGenRootTypes['Post']; // Post!
-    publishPost: NexusGenRootTypes['Post']; // Post!
-    removeItemFromCart: NexusGenRootTypes['Cart']; // Cart!
-    updateCartItem: NexusGenRootTypes['Cart']; // Cart!
-  }
-  Post: { // field return type
-    author: NexusGenRootTypes['User']; // User!
-    body: string; // String!
-    comments: Array<NexusGenRootTypes['Comment'] | null>; // [Comment]!
-    id: string; // ID!
-    published: boolean; // Boolean!
-    title: string; // String!
-  }
-  Product: { // field return type
     description: string; // String!
     id: string; // ID!
-    inStock: boolean | null; // Boolean
     name: string; // String!
-    price: number; // Int!
-    tags: string[]; // [String!]!
+    updatedAt: NexusGenScalars['DateTime'] | null; // DateTime
+    userId: string; // ID!
   }
   Query: { // field return type
-    cart: NexusGenRootTypes['Cart'] | null; // Cart
-    challenge: NexusGenRootTypes['Challenge'] | null; // Challenge
-    challenges: NexusGenRootTypes['Challenge'][]; // [Challenge!]!
-    post: NexusGenRootTypes['Post'] | null; // Post
-    posts: NexusGenRootTypes['Post'][]; // [Post!]!
-    product: NexusGenRootTypes['Product'] | null; // Product
-    products: NexusGenRootTypes['Product'][]; // [Product!]!
-    submission: NexusGenRootTypes['Submission'][]; // [Submission!]!
-    users: NexusGenRootTypes['User'][][] | null; // [[User!]!]
+    activeTask: Array<NexusGenRootTypes['Task'] | null> | null; // [Task]
   }
-  Submission: { // field return type
-    challenge: NexusGenRootTypes['Challenge']; // Challenge!
-    feedback: NexusGenRootTypes['Feedback'][]; // [Feedback!]!
-    id: string; // ID!
-    projectUrl: string; // String!
-    score: number | null; // Int
-    submitter: NexusGenRootTypes['UserChallenge']; // UserChallenge!
+  Session: { // field return type
+    actualBreakTime: number; // Int!
+    actualFocusTime: number; // Int!
+    createdAt: NexusGenScalars['DateTime'] | null; // DateTime
+    endedAt: NexusGenScalars['DateTime'] | null; // DateTime
+    pausedAt: NexusGenScalars['DateTime'] | null; // DateTime
+    sessionBreakTime: number; // Int!
+    sessionCount: number; // Int!
+    sessionFocusTime: number; // Int!
+    sessionStatus: NexusGenEnums['SessionStatus']; // SessionStatus!
+    userId: string; // ID!
   }
   Task: { // field return type
-    actualPomodoros: number; // Int!
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
-    estimatedPomodoros: number; // Int!
+    completed: boolean | null; // Boolean
+    completedAt: NexusGenScalars['DateTime'] | null; // DateTime
+    createdAt: NexusGenScalars['DateTime'] | null; // DateTime
+    currentCount: number | null; // Int
+    description: string; // String!
+    estimatedCount: number | null; // Int
     id: string; // ID!
-    isActive: boolean; // Boolean!
-    isChecked: boolean; // Boolean!
-    listName: string; // String!
-    status: NexusGenEnums['TaskStatus']; // TaskStatus!
-    title: string; // String!
-    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    is_checked: boolean | null; // Boolean
+    projectId: string; // ID!
+    updatedAt: NexusGenScalars['DateTime'] | null; // DateTime
   }
   User: { // field return type
+    createdAt: NexusGenScalars['DateTime'] | null; // DateTime
     email: string; // String!
     id: string; // ID!
     name: string; // String!
+    updatedAt: NexusGenScalars['DateTime'] | null; // DateTime
   }
-  UserChallenge: { // field return type
-    id: string | null; // ID
-    role: NexusGenEnums['RoleEnum']; // RoleEnum!
-    username: string | null; // String
+  UserPrefs: { // field return type
+    breakTime: number; // Int!
+    darkMode: boolean; // Boolean!
+    focusTime: number; // Int!
+    longBreakInterval: number; // Int!
+    longBreakTime: number; // Int!
+    userId: string; // ID!
   }
 }
 
 export interface NexusGenFieldTypeNames {
-  Cart: { // field return type name
+  MusicTrack: { // field return type name
+    artistName: 'String'
+    audioUrl: 'String'
+    coverImageUrl: 'String'
+    durationSeconds: 'Int'
     id: 'ID'
-    items: 'CartItem'
-    totalPrice: 'Float'
-  }
-  CartItem: { // field return type name
-    product: 'Product'
-    quantity: 'Int'
-  }
-  Challenge: { // field return type name
-    description: 'String'
-    endAt: 'DateTime'
-    id: 'ID'
-    requiredStack: 'String'
-    startAt: 'DateTime'
-    submissions: 'Submission'
+    isLoopable: 'Boolean'
     title: 'String'
   }
-  Comment: { // field return type name
-    author: 'User'
-    body: 'String'
-    id: 'ID'
-    post: 'Post'
-  }
-  Feedback: { // field return type name
-    author: 'UserChallenge'
-    body: 'String'
+  Project: { // field return type name
+    color: 'String'
     createdAt: 'DateTime'
-    id: 'ID'
-    rating: 'Int'
-  }
-  Mutation: { // field return type name
-    addComment: 'Comment'
-    addItemToCart: 'Cart'
-    createCart: 'Cart'
-    createPost: 'Post'
-    publishPost: 'Post'
-    removeItemFromCart: 'Cart'
-    updateCartItem: 'Cart'
-  }
-  Post: { // field return type name
-    author: 'User'
-    body: 'String'
-    comments: 'Comment'
-    id: 'ID'
-    published: 'Boolean'
-    title: 'String'
-  }
-  Product: { // field return type name
     description: 'String'
     id: 'ID'
-    inStock: 'Boolean'
     name: 'String'
-    price: 'Int'
-    tags: 'String'
+    updatedAt: 'DateTime'
+    userId: 'ID'
   }
   Query: { // field return type name
-    cart: 'Cart'
-    challenge: 'Challenge'
-    challenges: 'Challenge'
-    post: 'Post'
-    posts: 'Post'
-    product: 'Product'
-    products: 'Product'
-    submission: 'Submission'
-    users: 'User'
+    activeTask: 'Task'
   }
-  Submission: { // field return type name
-    challenge: 'Challenge'
-    feedback: 'Feedback'
-    id: 'ID'
-    projectUrl: 'String'
-    score: 'Int'
-    submitter: 'UserChallenge'
+  Session: { // field return type name
+    actualBreakTime: 'Int'
+    actualFocusTime: 'Int'
+    createdAt: 'DateTime'
+    endedAt: 'DateTime'
+    pausedAt: 'DateTime'
+    sessionBreakTime: 'Int'
+    sessionCount: 'Int'
+    sessionFocusTime: 'Int'
+    sessionStatus: 'SessionStatus'
+    userId: 'ID'
   }
   Task: { // field return type name
-    actualPomodoros: 'Int'
+    completed: 'Boolean'
+    completedAt: 'DateTime'
     createdAt: 'DateTime'
-    estimatedPomodoros: 'Int'
+    currentCount: 'Int'
+    description: 'String'
+    estimatedCount: 'Int'
     id: 'ID'
-    isActive: 'Boolean'
-    isChecked: 'Boolean'
-    listName: 'String'
-    status: 'TaskStatus'
-    title: 'String'
+    is_checked: 'Boolean'
+    projectId: 'ID'
     updatedAt: 'DateTime'
   }
   User: { // field return type name
+    createdAt: 'DateTime'
     email: 'String'
     id: 'ID'
     name: 'String'
+    updatedAt: 'DateTime'
   }
-  UserChallenge: { // field return type name
-    id: 'ID'
-    role: 'RoleEnum'
-    username: 'String'
+  UserPrefs: { // field return type name
+    breakTime: 'Int'
+    darkMode: 'Boolean'
+    focusTime: 'Int'
+    longBreakInterval: 'Int'
+    longBreakTime: 'Int'
+    userId: 'ID'
   }
 }
 
 export interface NexusGenArgTypes {
-  Comment: {
-    author: { // args
-      id: string; // ID!
-    }
-    post: { // args
-      id: string; // ID!
-    }
-  }
-  Mutation: {
-    addComment: { // args
-      authorId: string; // ID!
-      body: string; // String!
-      postId: string; // ID!
-    }
-    addItemToCart: { // args
-      cartId: string; // ID!
-      productId: string; // ID!
-      quantity: number; // Int!
-    }
-    createPost: { // args
-      data?: NexusGenInputs['CreatePostInputType'] | null; // CreatePostInputType
-    }
-    publishPost: { // args
-      id: string; // ID!
-    }
-    removeItemFromCart: { // args
-      cartId: string; // ID!
-      productId: string; // ID!
-    }
-    updateCartItem: { // args
-      cartId: string; // ID!
-      productId: string; // ID!
-      quantity: number; // Int!
-    }
-  }
-  Post: {
-    author: { // args
-      id: string; // ID!
-    }
-  }
-  Query: {
-    cart: { // args
-      id: string; // ID!
-    }
-    challenge: { // args
-      id: string; // ID!
-    }
-    challenges: { // args
-      activeOnly?: boolean | null; // Boolean
-      stack?: string | null; // String
-    }
-    post: { // args
-      id: string; // ID!
-    }
-    posts: { // args
-      data?: NexusGenInputs['PostsInputType'] | null; // PostsInputType
-    }
-    product: { // args
-      id: string; // ID!
-    }
-    products: { // args
-      maxPrice?: number | null; // Float
-      minPrice?: number | null; // Float
-      search?: string | null; // String
-      tag?: string | null; // String
-    }
-    submission: { // args
-      challengeId: string; // ID!
-    }
-  }
 }
 
 export interface NexusGenAbstractTypeMembers {
@@ -415,7 +252,7 @@ export interface NexusGenTypeInterfaces {
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
 
-export type NexusGenInputNames = keyof NexusGenInputs;
+export type NexusGenInputNames = never;
 
 export type NexusGenEnumNames = keyof NexusGenEnums;
 
@@ -438,7 +275,7 @@ export type NexusGenFeaturesConfig = {
 }
 
 export interface NexusGenTypes {
-  context: any;
+  context: GraphQLContext;
   inputTypes: NexusGenInputs;
   rootTypes: NexusGenRootTypes;
   inputTypeShapes: NexusGenInputs & NexusGenEnums & NexusGenScalars;

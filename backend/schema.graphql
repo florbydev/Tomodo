@@ -2,141 +2,81 @@
 ### Do not make changes to this file directly
 
 
-type Cart {
-  id: ID!
-  items: [CartItem!]!
-  totalPrice: Float!
-}
-
-type CartItem {
-  product: Product
-  quantity: Int!
-}
-
-type Challenge {
-  description: String
-  endAt: DateTime!
-  id: ID!
-  requiredStack: [String!]!
-  startAt: DateTime!
-  submissions: [Submission!]!
-  title: String!
-}
-
-type Comment {
-  author(id: ID!): User!
-  body: String!
-  id: ID!
-  post(id: ID!): Post!
-}
-
-input CreatePostInputType {
-  authorId: ID!
-  body: String!
-  title: String!
-}
-
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
 
-type Feedback {
-  author: UserChallenge!
-  body: String
-  createdAt: DateTime
+type MusicTrack {
+  artistName: String!
+  audioUrl: String!
+  coverImageUrl: String!
+  durationSeconds: Int!
   id: ID!
-  rating: Int
-}
-
-type Mutation {
-  addComment(authorId: ID!, body: String!, postId: ID!): Comment!
-  addItemToCart(cartId: ID!, productId: ID!, quantity: Int!): Cart!
-  createCart: Cart!
-  createPost(data: CreatePostInputType): Post!
-  publishPost(id: ID!): Post!
-  removeItemFromCart(cartId: ID!, productId: ID!): Cart!
-  updateCartItem(cartId: ID!, productId: ID!, quantity: Int!): Cart!
-}
-
-type Post {
-  author(id: ID!): User!
-  body: String!
-  comments: [Comment]!
-  id: ID!
-  published: Boolean!
+  isLoopable: Boolean
   title: String!
 }
 
-input PostsInputType {
-  published: Boolean
-  search: String
-}
-
-type Product {
+type Project {
+  color: String!
+  createdAt: DateTime
   description: String!
   id: ID!
-  inStock: Boolean
   name: String!
-  price: Int!
-  tags: [String!]!
+  updatedAt: DateTime
+  userId: ID!
 }
 
 type Query {
-  cart(id: ID!): Cart
-  challenge(id: ID!): Challenge
-  challenges(activeOnly: Boolean, stack: String): [Challenge!]!
-  post(id: ID!): Post
-  posts(data: PostsInputType): [Post!]!
-  product(id: ID!): Product
-  products(maxPrice: Float, minPrice: Float, search: String, tag: String): [Product!]!
-  submission(challengeId: ID!): [Submission!]!
-  users: [[User!]!]
+  activeTask: [Task]
 }
 
-enum RoleEnum {
-  DEVELOPER
-  JUDGE
-  ORGANIZER
+type Session {
+  actualBreakTime: Int!
+  actualFocusTime: Int!
+  createdAt: DateTime
+  endedAt: DateTime
+  pausedAt: DateTime
+  sessionBreakTime: Int!
+  sessionCount: Int!
+  sessionFocusTime: Int!
+  sessionStatus: SessionStatus!
+  userId: ID!
 }
 
-type Submission {
-  challenge: Challenge!
-  feedback: [Feedback!]!
-  id: ID!
-  projectUrl: String!
-  score: Int
-  submitter: UserChallenge!
+enum SessionStatus {
+  END
+  PAUSE
+  PLAY
+  RUNNING
 }
 
 type Task {
-  actualPomodoros: Int!
-  createdAt: DateTime!
-  estimatedPomodoros: Int!
+  completed: Boolean
+  completedAt: DateTime
+  createdAt: DateTime
+  currentCount: Int
+  description: String!
+  estimatedCount: Int
   id: ID!
-  isActive: Boolean!
-  isChecked: Boolean!
-  listName: String!
-  status: TaskStatus!
-  title: String!
-  updatedAt: DateTime!
-}
-
-enum TaskStatus {
-  COMPLETED
-  IN_PROGRESS
-  NOT_STARTED
-  OVERACHIEVED
+  is_checked: Boolean
+  projectId: ID!
+  updatedAt: DateTime
 }
 
 type User {
+  createdAt: DateTime
   email: String!
   id: ID!
   name: String!
+  updatedAt: DateTime
 }
 
-type UserChallenge {
-  id: ID
-  role: RoleEnum!
-  username: String
+type UserPrefs {
+  breakTime: Int!
+  darkMode: Boolean!
+  focusTime: Int!
+  longBreakInterval: Int!
+  longBreakTime: Int!
+  userId: ID!
 }
