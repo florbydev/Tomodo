@@ -1,39 +1,40 @@
-import { enumType, objectType } from "nexus";
+import { objectType } from "nexus";
 
-export const TaskStatus = enumType({
-  name: "TaskStatus",
-  members: ["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "OVERACHIEVED"],
-});
+// TaskType
+// - id
+// - projectID
+// - description
+// - estimatedCount
+// - currentCount
+// - createdAt
+// - updatedAt
+// - is_checked
+// - completed
+// - completedAt
 
-export const Task = objectType({
+export const TaskType = objectType({
   name: "Task",
   definition(t) {
-    t.nonNull.id("id");
-    t.nonNull.string("title");
-    t.nonNull.boolean("isChecked");
-    t.nonNull.string("listName");
-    t.nonNull.int("actualPomodoros");
-    t.nonNull.int("estimatedPomodoros");
-
-    // status is derived from actualPomodoros / estimatedPomodoros
-    t.nonNull.field("status", {
-      type: "TaskStatus",
-      resolve(root) {
-        const actual = root.actualPomodoros ?? 0;
-        const estimate = root.estimatedPomodoros ?? 0;
-
-        if (actual === 0 && estimate > 0) return "NOT_STARTED";
-        if (estimate === 0 && actual === 0) return "NOT_STARTED";
-        if (actual < estimate) return "IN_PROGRESS";
-        if (actual === estimate) return "COMPLETED";
-        return "OVERACHIEVED";
-      },
-    });
-
-    t.nonNull.boolean("isActive");
-
-    // Assuming you have a DateTime scalar wired in your schema
-    t.nonNull.field("createdAt", { type: "DateTime" });
-    t.nonNull.field("updatedAt", { type: "DateTime" });
+    t.nonNull.id("id"),
+      t.nonNull.id("projectID"),
+      t.nonNull.string("description"),
+      t.int("estimatedCount"),
+      t.int("currentCount"),
+      t.field("createdAt", { type: "DateTime" }),
+      t.field("updatedAt", { type: "DateTime" }),
+      t.field("completedAt", { type: "DateTime" }),
+      t.boolean("is_checked"),
+      t.boolean("completed");
   },
 });
+
+// - create task
+// - update is_checked
+// - update completed
+// - update currentCount
+// - get a list of task by active task/past logs
+// - get a list of task by filter
+// - remove a task (?)
+
+// PomoPhase
+// focus, short_break, long_break
