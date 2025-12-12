@@ -13,6 +13,16 @@ type CartItem {
   quantity: Int!
 }
 
+type Challenge {
+  description: String
+  endAt: DateTime!
+  id: ID!
+  requiredStack: [String!]!
+  startAt: DateTime!
+  submissions: [Submission!]!
+  title: String!
+}
+
 type Comment {
   author(id: ID!): User!
   body: String!
@@ -30,6 +40,14 @@ input CreatePostInputType {
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
+
+type Feedback {
+  author: UserChallenge!
+  body: String
+  createdAt: DateTime
+  id: ID!
+  rating: Int
+}
 
 type Mutation {
   addComment(authorId: ID!, body: String!, postId: ID!): Comment!
@@ -66,11 +84,29 @@ type Product {
 
 type Query {
   cart(id: ID!): Cart
+  challenge(id: ID!): Challenge
+  challenges(activeOnly: Boolean, stack: String): [Challenge!]!
   post(id: ID!): Post
   posts(data: PostsInputType): [Post!]!
   product(id: ID!): Product
   products(maxPrice: Float, minPrice: Float, search: String, tag: String): [Product!]!
+  submission(challengeId: ID!): [Submission!]!
   users: [[User!]!]
+}
+
+enum RoleEnum {
+  DEVELOPER
+  JUDGE
+  ORGANIZER
+}
+
+type Submission {
+  challenge: Challenge!
+  feedback: [Feedback!]!
+  id: ID!
+  projectUrl: String!
+  score: Int
+  submitter: UserChallenge!
 }
 
 type Task {
@@ -97,4 +133,10 @@ type User {
   email: String!
   id: ID!
   name: String!
+}
+
+type UserChallenge {
+  id: ID
+  role: RoleEnum!
+  username: String
 }

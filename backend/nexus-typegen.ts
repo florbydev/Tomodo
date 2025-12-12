@@ -40,6 +40,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  RoleEnum: "DEVELOPER" | "JUDGE" | "ORGANIZER"
   TaskStatus: "COMPLETED" | "IN_PROGRESS" | "NOT_STARTED" | "OVERACHIEVED"
 }
 
@@ -60,9 +61,24 @@ export interface NexusGenObjects {
   CartItem: { // root type
     quantity: number; // Int!
   }
+  Challenge: { // root type
+    description?: string | null; // String
+    endAt: NexusGenScalars['DateTime']; // DateTime!
+    id: string; // ID!
+    requiredStack: string[]; // [String!]!
+    startAt: NexusGenScalars['DateTime']; // DateTime!
+    title: string; // String!
+  }
   Comment: { // root type
     body: string; // String!
     id: string; // ID!
+  }
+  Feedback: { // root type
+    author: NexusGenRootTypes['UserChallenge']; // UserChallenge!
+    body?: string | null; // String
+    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    id: string; // ID!
+    rating?: number | null; // Int
   }
   Mutation: {};
   Post: { // root type
@@ -80,6 +96,11 @@ export interface NexusGenObjects {
     tags: string[]; // [String!]!
   }
   Query: {};
+  Submission: { // root type
+    id: string; // ID!
+    projectUrl: string; // String!
+    score?: number | null; // Int
+  }
   Task: { // root type
     actualPomodoros: number; // Int!
     createdAt: NexusGenScalars['DateTime']; // DateTime!
@@ -95,6 +116,11 @@ export interface NexusGenObjects {
     email: string; // String!
     id: string; // ID!
     name: string; // String!
+  }
+  UserChallenge: { // root type
+    id?: string | null; // ID
+    role: NexusGenEnums['RoleEnum']; // RoleEnum!
+    username?: string | null; // String
   }
 }
 
@@ -118,11 +144,27 @@ export interface NexusGenFieldTypes {
     product: NexusGenRootTypes['Product'] | null; // Product
     quantity: number; // Int!
   }
+  Challenge: { // field return type
+    description: string | null; // String
+    endAt: NexusGenScalars['DateTime']; // DateTime!
+    id: string; // ID!
+    requiredStack: string[]; // [String!]!
+    startAt: NexusGenScalars['DateTime']; // DateTime!
+    submissions: NexusGenRootTypes['Submission'][]; // [Submission!]!
+    title: string; // String!
+  }
   Comment: { // field return type
     author: NexusGenRootTypes['User']; // User!
     body: string; // String!
     id: string; // ID!
     post: NexusGenRootTypes['Post']; // Post!
+  }
+  Feedback: { // field return type
+    author: NexusGenRootTypes['UserChallenge']; // UserChallenge!
+    body: string | null; // String
+    createdAt: NexusGenScalars['DateTime'] | null; // DateTime
+    id: string; // ID!
+    rating: number | null; // Int
   }
   Mutation: { // field return type
     addComment: NexusGenRootTypes['Comment']; // Comment!
@@ -151,11 +193,22 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     cart: NexusGenRootTypes['Cart'] | null; // Cart
+    challenge: NexusGenRootTypes['Challenge'] | null; // Challenge
+    challenges: NexusGenRootTypes['Challenge'][]; // [Challenge!]!
     post: NexusGenRootTypes['Post'] | null; // Post
     posts: NexusGenRootTypes['Post'][]; // [Post!]!
     product: NexusGenRootTypes['Product'] | null; // Product
     products: NexusGenRootTypes['Product'][]; // [Product!]!
+    submission: NexusGenRootTypes['Submission'][]; // [Submission!]!
     users: NexusGenRootTypes['User'][][] | null; // [[User!]!]
+  }
+  Submission: { // field return type
+    challenge: NexusGenRootTypes['Challenge']; // Challenge!
+    feedback: NexusGenRootTypes['Feedback'][]; // [Feedback!]!
+    id: string; // ID!
+    projectUrl: string; // String!
+    score: number | null; // Int
+    submitter: NexusGenRootTypes['UserChallenge']; // UserChallenge!
   }
   Task: { // field return type
     actualPomodoros: number; // Int!
@@ -174,6 +227,11 @@ export interface NexusGenFieldTypes {
     id: string; // ID!
     name: string; // String!
   }
+  UserChallenge: { // field return type
+    id: string | null; // ID
+    role: NexusGenEnums['RoleEnum']; // RoleEnum!
+    username: string | null; // String
+  }
 }
 
 export interface NexusGenFieldTypeNames {
@@ -186,11 +244,27 @@ export interface NexusGenFieldTypeNames {
     product: 'Product'
     quantity: 'Int'
   }
+  Challenge: { // field return type name
+    description: 'String'
+    endAt: 'DateTime'
+    id: 'ID'
+    requiredStack: 'String'
+    startAt: 'DateTime'
+    submissions: 'Submission'
+    title: 'String'
+  }
   Comment: { // field return type name
     author: 'User'
     body: 'String'
     id: 'ID'
     post: 'Post'
+  }
+  Feedback: { // field return type name
+    author: 'UserChallenge'
+    body: 'String'
+    createdAt: 'DateTime'
+    id: 'ID'
+    rating: 'Int'
   }
   Mutation: { // field return type name
     addComment: 'Comment'
@@ -219,11 +293,22 @@ export interface NexusGenFieldTypeNames {
   }
   Query: { // field return type name
     cart: 'Cart'
+    challenge: 'Challenge'
+    challenges: 'Challenge'
     post: 'Post'
     posts: 'Post'
     product: 'Product'
     products: 'Product'
+    submission: 'Submission'
     users: 'User'
+  }
+  Submission: { // field return type name
+    challenge: 'Challenge'
+    feedback: 'Feedback'
+    id: 'ID'
+    projectUrl: 'String'
+    score: 'Int'
+    submitter: 'UserChallenge'
   }
   Task: { // field return type name
     actualPomodoros: 'Int'
@@ -241,6 +326,11 @@ export interface NexusGenFieldTypeNames {
     email: 'String'
     id: 'ID'
     name: 'String'
+  }
+  UserChallenge: { // field return type name
+    id: 'ID'
+    role: 'RoleEnum'
+    username: 'String'
   }
 }
 
@@ -289,6 +379,13 @@ export interface NexusGenArgTypes {
     cart: { // args
       id: string; // ID!
     }
+    challenge: { // args
+      id: string; // ID!
+    }
+    challenges: { // args
+      activeOnly?: boolean | null; // Boolean
+      stack?: string | null; // String
+    }
     post: { // args
       id: string; // ID!
     }
@@ -303,6 +400,9 @@ export interface NexusGenArgTypes {
       minPrice?: number | null; // Float
       search?: string | null; // String
       tag?: string | null; // String
+    }
+    submission: { // args
+      challengeId: string; // ID!
     }
   }
 }

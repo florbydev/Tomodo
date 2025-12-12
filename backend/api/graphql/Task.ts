@@ -1,12 +1,9 @@
-import { DateTimeResolver } from "graphql-scalars";
-import { asNexusMethod, enumType, objectType } from "nexus";
+import { enumType, objectType } from "nexus";
 
 export const TaskStatus = enumType({
   name: "TaskStatus",
   members: ["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "OVERACHIEVED"],
 });
-
-export const DateTime = asNexusMethod(DateTimeResolver, "date");
 
 export const Task = objectType({
   name: "Task",
