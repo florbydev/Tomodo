@@ -12,4 +12,14 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  server: {
+    proxy: {
+      // proxy all requests starting with /graphql
+      "/graphql": {
+        target: "http://localhost:8080", // your GraphQL API server
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/graphql/, "/graphql"),
+      },
+    },
+  },
 });
