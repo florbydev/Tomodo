@@ -13,6 +13,7 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   server: {
+    host: "0.0.0.0",
     proxy: {
       // proxy all requests starting with /graphql
       "/graphql": {
