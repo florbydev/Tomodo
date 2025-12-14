@@ -33,7 +33,7 @@ export interface TasksTable {
   currentCount: number | null;
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
-  is_checked: boolean | null;
+  isChecked: boolean | null;
   completed: boolean | null;
   completedAt: Timestamp | null;
 }

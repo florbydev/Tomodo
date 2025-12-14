@@ -26,7 +26,7 @@ export const TaskType = objectType({
       t.field("createdAt", { type: "DateTime" }),
       t.field("updatedAt", { type: "DateTime" }),
       t.field("completedAt", { type: "DateTime" }),
-      t.boolean("is_checked"),
+      t.boolean("isChecked"),
       t.boolean("completed");
   },
 });
@@ -44,7 +44,7 @@ export const TaskQuery = queryField((t) => {
           "currentCount",
           "createdAt",
           "updatedAt",
-          "is_checked",
+          "isChecked",
           "completed",
           "completedAt",
           "projectId",

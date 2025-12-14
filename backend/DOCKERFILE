@@ -1,0 +1,24 @@
+# Dockerfile.dev
+FROM node:lts-trixie
+
+WORKDIR /app
+
+# OS deps (optional but common for native builds / tooling)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ca-certificates \
+  openssl \
+  && rm -rf /var/lib/apt/lists/*
+
+# Copy only dependency manifests first for better layer caching
+COPY package.json package-lock.json ./
+
+# Install deps (dev deps included by default)
+RUN npm ci
+
+# Copy the rest (for image-only usage; in dev we'll mount a volume anyway)
+COPY . .
+
+EXPOSE 8080
+
+# Run your dev script (should be watch mode)
+CMD ["npm", "run", "dev"]

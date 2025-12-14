@@ -1,8 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { Heading } from "@/components/shared/typography";
-import { Suspense } from "react";
-
-// src/graphql/fetchGraphQL.ts
+import { Suspense, useEffect, useState } from "react";
 
 export async function fetchGraphQL<TData>(
   query: string,
@@ -10,81 +7,96 @@ export async function fetchGraphQL<TData>(
 ): Promise<TData> {
   const res = await fetch("/graphql", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query, variables }),
   });
 
-  const json: { data: TData; errors?: { message: string }[] } =
-    await res.json();
+  const json: { data: TData; errors?: { message: string }[] } = await res.json();
 
-  if (json.errors) {
+  if (json.errors?.length) {
     console.error(json.errors);
-    throw new Error("GraphQL error");
+    throw new Error(json.errors[0]?.message ?? "GraphQL error");
   }
 
   return json.data;
 }
 
-type Post = {
-  id: number;
-  title: string;
-  body: string;
-  published: boolean;
-};
-
-const GET_POSTS = `
-  query GetPosts {
-    drafts {
+const GET_TASKS = `
+  query {
+    activeTask {
       id
-      title
-      body
-      published
+      projectId
+      description
+      estimatedCount
+      currentCount
+      isChecked
+      completed
+      updatedAt
     }
   }
 `;
 
-function wrapPromise<T>(promise: Promise<T>) {
-  let status: "pending" | "success" | "error" = "pending";
-  let result: T;
-  let error: unknown;
+type Task = {
+  id: string;
+  projectId: string;
+  description: string;
+  estimatedCount: number | null;
+  currentCount: number | null;
+  isChecked: boolean;
+  completed: boolean;
+  updatedAt: string;
+};
 
-  const suspender = promise.then(
-    (r) => {
-      status = "success";
-      result = r;
-    },
-    (e) => {
-      status = "error";
-      error = e;
-    }
-  );
+function Tasks() {
+  const [tasks, setTasks] = useState<Task[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  return {
-    read(): T {
-      if (status === "pending") throw suspender;
-      if (status === "error") throw error;
-      return result!;
-    },
-  };
-}
+  useEffect(() => {
+    let cancelled = false;
 
-const postResource = wrapPromise(
-  fetchGraphQL<{ drafts: Post[] }>(GET_POSTS).then((data) => data.drafts)
-);
+    fetchGraphQL<{ activeTask: Task[] }>(GET_TASKS)
+      .then((data) => {
+        if (!cancelled) setTasks(data.activeTask);
+      })
+      .catch((e: unknown) => {
+        if (!cancelled) setError(e instanceof Error ? e.message : "Unknown error");
+      });
 
-function Posts() {
-  const posts = postResource.read(); // -> typed as Post[]
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (error) return <p>Failed to load tasks: {error}</p>;
+  if (!tasks) return <p>Loading…</p>;
+  if (tasks.length === 0) return <p>No tasks yet.</p>;
+
   return (
-    <Heading as="h2">Hello World {posts[0]?.title ?? "No posts"}</Heading>
+    <div style={{ padding: 16 }}>
+      <h2>Tasks</h2>
+      <ul style={{ display: "grid", gap: 12, paddingLeft: 18 }}>
+        {tasks.map((t) => (
+          <li key={t.id}>
+            <div>
+              <strong>{t.description}</strong>{" "}
+              {t.completed ? "✅" : t.isChecked ? "☑️" : "⬜"}
+            </div>
+            <div style={{ fontSize: 12, opacity: 0.8 }}>
+              Project: {t.projectId} • Count: {t.currentCount ?? 0}/
+              {t.estimatedCount ?? "?"} • Updated:{" "}
+              {new Date(t.updatedAt).toLocaleString()}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 function App() {
   return (
     <Suspense fallback={<p>Loading…</p>}>
-      <Posts />
+      <Tasks />
     </Suspense>
   );
 }

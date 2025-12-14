@@ -59,7 +59,7 @@ type Task {
   description: String!
   estimatedCount: Int
   id: ID!
-  is_checked: Boolean
+  isChecked: Boolean
   projectId: ID!
   updatedAt: DateTime
 }

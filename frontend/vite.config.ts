@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react({
@@ -15,11 +14,9 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     proxy: {
-      // proxy all requests starting with /graphql
       "/graphql": {
-        target: "http://localhost:8080", // your GraphQL API server
+        target: "http://api:8080", // <-- use compose service name
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/graphql/, "/graphql"),
       },
     },
   },

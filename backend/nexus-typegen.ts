@@ -84,7 +84,7 @@ export interface NexusGenObjects {
     description: string; // String!
     estimatedCount?: number | null; // Int
     id: string; // ID!
-    is_checked?: boolean | null; // Boolean
+    isChecked?: boolean | null; // Boolean
     projectId: string; // ID!
     updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
   }
@@ -157,7 +157,7 @@ export interface NexusGenFieldTypes {
     description: string; // String!
     estimatedCount: number | null; // Int
     id: string; // ID!
-    is_checked: boolean | null; // Boolean
+    isChecked: boolean | null; // Boolean
     projectId: string; // ID!
     updatedAt: NexusGenScalars['DateTime'] | null; // DateTime
   }
@@ -220,7 +220,7 @@ export interface NexusGenFieldTypeNames {
     description: 'String'
     estimatedCount: 'Int'
     id: 'ID'
-    is_checked: 'Boolean'
+    isChecked: 'Boolean'
     projectId: 'ID'
     updatedAt: 'DateTime'
   }
