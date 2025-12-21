@@ -4,9 +4,10 @@ import { buildServer } from "./server";
 async function main() {
   const { server } = buildServer();
 
+  const PORT = Number(process.env.PORT || 8080);
   try {
     const address = await server.listen({
-      port: 8080,
+      port: PORT,
       host: "0.0.0.0",
     });
     console.log(`Server listening at ${address}`);

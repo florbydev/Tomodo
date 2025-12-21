@@ -1,58 +1,35 @@
 services:
-  api:
+  backend:
     build:
       context: ./backend
-      dockerfile: DOCKERFILE
+      dockerfile: Dockerfile.dev
     ports:
       - "8080:8080"
+    env_file:
+      - ./backend/.env
     environment:
-      NODE_ENV: development
       PORT: 8080
-      DATABASE_URL: postgres://postgres:postgres@db:5432/app
-      # Helps file watching inside Docker on Mac/Windows
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
     volumes:
       - ./backend:/app
-      # Prevent host bind-mount from overwriting container node_modules
       - /app/node_modules
     depends_on:
-      db:
+      database:
         condition: service_healthy
 
-  db:
+  database:
     image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: app
+    env_file:
+      - ./backend/src/db/.env
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
-      interval: 3s
-      timeout: 3s
-      retries: 20
-  migrate:
-    image: node:lts-trixie
-    working_dir: /app
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/app
-    volumes:
-      - ./backend:/app
-    command: sh -c "npm ci && npm run db:migrate"
-    profiles:
-      - migrate
-
   frontend:
     build:
       context: ./frontend
-      dockerfile: DOCKERFILE
+      dockerfile: Dockerfile.dev
     ports:
       - "5173:5173"
     environment:

@@ -15,7 +15,7 @@ export default defineConfig({
     host: "0.0.0.0",
     proxy: {
       "/graphql": {
-        target: "http://api:8080", // <-- use compose service name
+        target: "http://backend:8080", // <-- use compose service name
         changeOrigin: true,
       },
     },

@@ -17,6 +17,15 @@ type MusicTrack {
   title: String!
 }
 
+type Mutation {
+  createTask(currentCount: Int, description: String!, estimatedCount: Int, projectId: ID!): Task!
+  incrementTaskCurrentCount(by: Int, id: ID!): Task!
+  removeTask(id: ID!): Task!
+  setTaskCompleted(completed: Boolean!, id: ID!): Task!
+  setTaskCurrentCount(currentCount: Int!, id: ID!): Task!
+  setTaskIsChecked(id: ID!, isChecked: Boolean!): Task!
+}
+
 type Project {
   color: String!
   createdAt: DateTime

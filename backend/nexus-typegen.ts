@@ -54,6 +54,7 @@ export interface NexusGenObjects {
     isLoopable?: boolean | null; // Boolean
     title: string; // String!
   }
+  Mutation: {};
   Project: { // root type
     color: string; // String!
     createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
@@ -125,6 +126,14 @@ export interface NexusGenFieldTypes {
     isLoopable: boolean | null; // Boolean
     title: string; // String!
   }
+  Mutation: { // field return type
+    createTask: NexusGenRootTypes['Task']; // Task!
+    incrementTaskCurrentCount: NexusGenRootTypes['Task']; // Task!
+    removeTask: NexusGenRootTypes['Task']; // Task!
+    setTaskCompleted: NexusGenRootTypes['Task']; // Task!
+    setTaskCurrentCount: NexusGenRootTypes['Task']; // Task!
+    setTaskIsChecked: NexusGenRootTypes['Task']; // Task!
+  }
   Project: { // field return type
     color: string; // String!
     createdAt: NexusGenScalars['DateTime'] | null; // DateTime
@@ -188,6 +197,14 @@ export interface NexusGenFieldTypeNames {
     isLoopable: 'Boolean'
     title: 'String'
   }
+  Mutation: { // field return type name
+    createTask: 'Task'
+    incrementTaskCurrentCount: 'Task'
+    removeTask: 'Task'
+    setTaskCompleted: 'Task'
+    setTaskCurrentCount: 'Task'
+    setTaskIsChecked: 'Task'
+  }
   Project: { // field return type name
     color: 'String'
     createdAt: 'DateTime'
@@ -242,6 +259,33 @@ export interface NexusGenFieldTypeNames {
 }
 
 export interface NexusGenArgTypes {
+  Mutation: {
+    createTask: { // args
+      currentCount?: number | null; // Int
+      description: string; // String!
+      estimatedCount?: number | null; // Int
+      projectId: string; // ID!
+    }
+    incrementTaskCurrentCount: { // args
+      by?: number | null; // Int
+      id: string; // ID!
+    }
+    removeTask: { // args
+      id: string; // ID!
+    }
+    setTaskCompleted: { // args
+      completed: boolean; // Boolean!
+      id: string; // ID!
+    }
+    setTaskCurrentCount: { // args
+      currentCount: number; // Int!
+      id: string; // ID!
+    }
+    setTaskIsChecked: { // args
+      id: string; // ID!
+      isChecked: boolean; // Boolean!
+    }
+  }
 }
 
 export interface NexusGenAbstractTypeMembers {

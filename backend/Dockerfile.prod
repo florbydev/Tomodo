@@ -1,0 +1,40 @@
+# ---- deps stage (installs all deps for build) ----
+FROM node:22-alpine AS deps
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# ---- build stage (compile TypeScript, etc.) ----
+FROM node:22-alpine AS build
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# If you have a build step (TypeScript)
+RUN npm run build
+
+# ---- runtime stage (prod-only) ----
+FROM node:22-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Install only production deps
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+# Copy build artifacts (adjust if your output directory differs)
+COPY --from=build /app/dist ./dist
+
+# If you need runtime files (e.g. views, prisma schema, migrations), copy them too:
+# COPY --from=build /app/prisma ./prisma
+
+# Security: run as non-root (node user exists in node images)
+USER node
+
+# Match your app port
+EXPOSE 8080
+
+# Start command (adjust if different)
+CMD ["node", "dist/src/app.js"]

@@ -9,18 +9,15 @@ export async function up(db: Kysely<Database>) {
     .addColumn("description", "text", (col) => col.notNull())
     .addColumn("estimatedCount", "integer")
     .addColumn("currentCount", "integer")
-    .addColumn("isChecked", "boolean", (col) => col.defaultTo(false))
-    .addColumn("completed", "boolean", (col) => col.defaultTo(false))
-    .addColumn(
-      "createdAt",
-      "timestamptz",
-      (col) => col.notNull().defaultTo(sql`now()`)
-      // or: defaultTo(sql`CURRENT_TIMESTAMP`)
-    )
-    .addColumn("updated_at", "timestamptz", (col) =>
+    .addColumn("isChecked", "boolean", (col) => col.notNull().defaultTo(false))
+    .addColumn("completed", "boolean", (col) => col.notNull().defaultTo(false))
+    .addColumn("createdAt", "timestamptz", (col) =>
       col.notNull().defaultTo(sql`now()`)
     )
-    .addColumn("completed_at", "timestamptz")
+    .addColumn("updatedAt", "timestamptz", (col) =>
+      col.notNull().defaultTo(sql`now()`)
+    )
+    .addColumn("completedAt", "timestamptz")
     .execute();
 }
 

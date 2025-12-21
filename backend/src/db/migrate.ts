@@ -1,33 +1,17 @@
 import path from "path";
 import { promises as fs } from "fs"; // <-- important
-
-import { Pool } from "pg";
-import {
-  FileMigrationProvider,
-  Kysely,
-  Migrator,
-  PostgresDialect,
-} from "kysely";
-import type { Database } from "./types";
+import { FileMigrationProvider, Migrator } from "kysely";
+import { db } from "./database";
 
 async function migrate() {
   console.log("Running Migration");
-
-  const DATABASE_URL =
-    process.env.DATABASE_URL ?? "postgres://postgres:postgres@db:5432/app";
-
-  const db = new Kysely<Database>({
-    dialect: new PostgresDialect({
-      pool: new Pool({ connectionString: DATABASE_URL }),
-    }),
-  });
 
   const migrator = new Migrator({
     db,
     provider: new FileMigrationProvider({
       fs, // <-- fs.promises matches required types
       path,
-      migrationFolder: path.join(process.cwd(), "src/db/migrations"),
+      migrationFolder: path.join(__dirname, "migrations"),
       // If your migrations are under backend/migrations and you run from /app:
       // migrationFolder: path.join(process.cwd(), "migrations"),
       // If you run from backend/src, use:
