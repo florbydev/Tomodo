@@ -18,6 +18,7 @@ type MusicTrack {
 }
 
 type Mutation {
+  createProject: Project
   createTask(currentCount: Int, description: String!, estimatedCount: Int, projectId: ID!): Task!
   incrementTaskCurrentCount(by: Int, id: ID!): Task!
   removeTask(id: ID!): Task!

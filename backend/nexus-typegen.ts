@@ -127,6 +127,7 @@ export interface NexusGenFieldTypes {
     title: string; // String!
   }
   Mutation: { // field return type
+    createProject: NexusGenRootTypes['Project'] | null; // Project
     createTask: NexusGenRootTypes['Task']; // Task!
     incrementTaskCurrentCount: NexusGenRootTypes['Task']; // Task!
     removeTask: NexusGenRootTypes['Task']; // Task!
@@ -198,6 +199,7 @@ export interface NexusGenFieldTypeNames {
     title: 'String'
   }
   Mutation: { // field return type name
+    createProject: 'Project'
     createTask: 'Task'
     incrementTaskCurrentCount: 'Task'
     removeTask: 'Task'

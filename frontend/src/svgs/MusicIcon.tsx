@@ -1,0 +1,13 @@
+const MusicIcon = () => {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 12V3.33333L14 2V10.6667" stroke="#3F1F12" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 14C5.10457 14 6 13.1046 6 12C6 10.8954 5.10457 10 4 10C2.89543 10 2 10.8954 2 12C2 13.1046 2.89543 14 4 14Z" fill="#FFD485" stroke="#3F1F12" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 12.6667C13.1046 12.6667 14 11.7713 14 10.6667C14 9.56212 13.1046 8.66669 12 8.66669C10.8954 8.66669 10 9.56212 10 10.6667C10 11.7713 10.8954 12.6667 12 12.6667Z" fill="#FFD485" stroke="#3F1F12" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+
+  )
+}
+
+export default MusicIcon
+

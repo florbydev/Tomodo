@@ -1,16 +1,17 @@
 /* eslint-disable react-refresh/only-export-components */
 import type { ProjectType } from "@/components/types";
 import useOutsideClick from "@/hooks/useOutsideClick";
+import Filter from "@/svgs/Filter";
 import { createContext, useRef, useState } from "react";
 import { GoBriefcase } from "react-icons/go";
-import { MdKeyboardArrowDown } from "react-icons/md";
+import { MdArrowDropDown, MdKeyboardArrowDown, MdOutlineFilter } from "react-icons/md";
 
 type RootProps = {
   children?: React.ReactNode;
   projectList: Array<ProjectType>;
   value: ProjectType;
   onClick: (value: ProjectType) => void;
-  style?: {
+  style: {
     triggerStyle: string;
     contentStyle: string;
   }
@@ -29,7 +30,6 @@ export const DropdownContext = createContext<DropdownType | undefined>(undefined
 const Dropdown = ({ projectList, value, onClick }: RootProps) => {
   const [open, setIsOpen] = useState(false);
   const divRef = useRef(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useOutsideClick(divRef, open, () => {
     setIsOpen(false);
@@ -37,9 +37,8 @@ const Dropdown = ({ projectList, value, onClick }: RootProps) => {
 
   return (
     <div ref={divRef} className="relative">
-      <input ref={inputRef} type="hidden" name="dropdown-choice" id="dropdown-choice" />
-      <button type='button' className="flex items-center justify-center gap-x-1.5 bg-primary border border-outline cursor-pointer rounded-full px-2 py-1" onClick={() => setIsOpen(!open)}>
-        <GoBriefcase />
+      <button type='button' className="flex items-center justify-center gap-x-1.5 cursor-pointer rounded-full px-2 py-1" onClick={() => setIsOpen(!open)}>
+        <Filter />
         <p className="font-medium text-xs">{value?.name || "General"}</p>
         <MdKeyboardArrowDown />
       </button>
@@ -48,9 +47,6 @@ const Dropdown = ({ projectList, value, onClick }: RootProps) => {
           return <button
             className="whitespace-nowrap"
             onClick={() => {
-              if (inputRef.current) {
-                inputRef.current.value = projectItem.id;
-              }
               onClick(projectItem);
               setIsOpen(false);
             }}

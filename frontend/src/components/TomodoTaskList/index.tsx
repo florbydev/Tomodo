@@ -1,26 +1,85 @@
-import Badge from "./Badge"
-import Checkmark from "./Checkmark"
-import Filter from "./Filter"
-import ListItem from "./ListItem"
-import ListItemPomoCount from "./ListItemPomoCount"
-import ListView from "./ListView"
-import Tabs from "./Tabs"
+import { useMemo, useState } from "react";
+import classNames from "classnames";
+import type { ProjectType } from "@/components/types";
+import PastLogsView from "@/components/TomodoTaskList/PastLogsView";
+import ActiveTasksView from "@/components/TomodoTaskList/ActiveTasksView";
+import Dropdown from "@/components/TomodoTaskList/Dropdown";
+import { useTask } from "@/hooks/useTask";
 
-const Root = () => {
+export const TabState = {
+  ACTIVE_TASKS: 'active-tasks',
+  PAST_LOGS: 'past-logs',
+} as const;
+
+export type TabState = typeof TabState[keyof typeof TabState];
+
+
+const TomodoTaskList = () => {
+
+  const { projectList, activeTasks, setActiveTasks, pastLogs, setPastLogs, sessionTasks, setSessionTasks } = useTask();
+  const [currentProject, setCurrentProject] = useState(projectList[0]);
+  const filteredActiveTask = useMemo(() => {
+    return activeTasks.filter(task => task.project.id === currentProject.id)
+  }, [currentProject, activeTasks])
+
+  const filteredPastLogs = useMemo(() => {
+    return pastLogs.filter(task => task.project.id === currentProject.id)
+  }, [currentProject, pastLogs])
+
+  const onProjectChange = (newProject: ProjectType) => {
+    setCurrentProject(newProject);
+  }
+
+  const tabs = useMemo(() => [{
+    id: TabState.ACTIVE_TASKS,
+    label: 'Active Tasks'
+  }, {
+    id: TabState.PAST_LOGS,
+    label: 'Past Logs'
+  }], [])
+
+  const [currentTab, setCurrentTab] = useState<TabState>(TabState.ACTIVE_TASKS)
+
+  const changeTab = (currentTab: TabState) => {
+    return () => {
+      setCurrentTab(currentTab)
+    }
+  }
+
   return (
-    <div>Root</div>
+    <div className="flex justify-between flex-col gap-y-3 pb-4 border-b border-b-outline">
+      <div className="flex items-center justify-between ml-2">
+        <div>
+          {
+            tabs.map((tabItem) => {
+              const activeClass = classNames("font-light text-xs mx-2 cursor-pointer",
+                {
+                  'font-normal underline': currentTab === tabItem.id
+                }
+              )
+              return <button key={tabItem.id} className={activeClass} onClick={changeTab(tabItem.id)}>{tabItem.label}</button>
+            })
+          }
+        </div>
+        <Dropdown projectList={projectList} value={currentProject} onClick={onProjectChange} style={{
+          triggerStyle: "",
+          contentStyle: ""
+        }} />
+      </div>
+
+      {currentTab == TabState.PAST_LOGS && <PastLogsView
+        activeTasks={filteredActiveTask}
+        setActiveTasks={setActiveTasks}
+        pastLogs={filteredPastLogs}
+        setPastLogs={setPastLogs}
+      />}
+      {currentTab == TabState.ACTIVE_TASKS && <ActiveTasksView
+        activeTasks={filteredActiveTask}
+        sessionTasks={sessionTasks}
+        setSessionTasks={setSessionTasks}
+      />}
+    </div>
   )
 }
 
-const TomodoTaskList = {
-  Root: Root,
-  Badge: Badge,
-  Checkmark: Checkmark,
-  Filter: Filter,
-  ListItem: ListItem,
-  ListItemPomoCount: ListItemPomoCount,
-  ListView: ListView,
-  Tabs: Tabs,
-}
-
-export default TomodoTaskList
+export default TomodoTaskList;

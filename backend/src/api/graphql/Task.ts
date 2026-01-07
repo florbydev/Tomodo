@@ -79,7 +79,6 @@ export const TaskMutation = mutationField((t) => {
     },
     async resolve(_parent, args, ctx) {
       const now = new Date();
-
       const created = await ctx.db
         .insertInto("tasks")
         .values({

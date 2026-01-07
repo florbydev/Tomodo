@@ -1,298 +1,133 @@
-/* eslint-disable react-refresh/only-export-components */
-import { apiFetch } from "@/lib/api";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { useState } from "react";
+import classNames from "classnames";
 
-export async function fetchGraphQL<TData>(
-  query: string,
-  variables: Record<string, unknown> = {}
-): Promise<TData> {
-  const res = await apiFetch("/graphql", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query, variables }),
-  });
-
-  const json: { data: TData; errors?: { message: string }[] } = await res.json();
-
-  if (json.errors?.length) {
-    console.error(json.errors);
-    throw new Error(json.errors[0]?.message ?? "GraphQL error");
-  }
-
-  return json.data;
-}
-
-const GET_TASKS = `
-  query {
-    activeTask {
-      id
-      projectId
-      description
-      estimatedCount
-      currentCount
-      isChecked
-      completed
-      updatedAt
-      completedAt
-    }
-  }
-`;
-
-const SET_TASK_IS_CHECKED = `
-  mutation SetTaskIsChecked($id: ID!, $isChecked: Boolean!) {
-    setTaskIsChecked(id: $id, isChecked: $isChecked) {
-      id
-      isChecked
-      updatedAt
-    }
-  }
-`;
-
-const SET_TASK_COMPLETED = `
-  mutation SetTaskCompleted($id: ID!, $completed: Boolean!) {
-    setTaskCompleted(id: $id, completed: $completed) {
-      id
-      completed
-      completedAt
-      updatedAt
-    }
-  }
-`;
-
-const INCREMENT_TASK_CURRENT_COUNT = `
-  mutation IncrementTaskCurrentCount($id: ID!, $by: Int) {
-    incrementTaskCurrentCount(id: $id, by: $by) {
-      id
-      currentCount
-      updatedAt
-    }
-  }
-`;
-
-// optional: create task
-const CREATE_TASK = `
-  mutation CreateTask($projectId: ID!, $description: String!, $estimatedCount: Int, $currentCount: Int) {
-    createTask(projectId: $projectId, description: $description, estimatedCount: $estimatedCount, currentCount: $currentCount) {
-      id
-      projectId
-      description
-      estimatedCount
-      currentCount
-      isChecked
-      completed
-      updatedAt
-    }
-  }
-`;
-
-type Task = {
-  id: string;
-  projectId: string;
-  description: string;
-  estimatedCount: number | null;
-  currentCount: number | null;
-  isChecked: boolean;
-  completed: boolean;
-  updatedAt: string;
-  completedAt?: string | null;
-};
-
-function Tasks() {
-  const [tasks, setTasks] = useState<Task[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  // tiny form for createTask
-  const [newDesc, setNewDesc] = useState("");
-  const [newProjectId, setNewProjectId] = useState("");
-  const [newEstimated, setNewEstimated] = useState<string>("");
-
-  const loadTasks = useMemo(
-    () => async () => {
-      const data = await fetchGraphQL<{ activeTask: Task[] }>(GET_TASKS);
-      setTasks(data.activeTask);
-    },
-    []
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const data = await fetchGraphQL<{ activeTask: Task[] }>(GET_TASKS);
-        if (!cancelled) setTasks(data.activeTask);
-      } catch (e: unknown) {
-        if (!cancelled)
-          setError(e instanceof Error ? e.message : "Unknown error");
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  async function toggleChecked(task: Task) {
-    // optimistic update
-    setTasks((prev) =>
-      prev
-        ? prev.map((t) =>
-          t.id === task.id ? { ...t, isChecked: !t.isChecked } : t
-        )
-        : prev
-    );
-
-    try {
-      await fetchGraphQL<{ setTaskIsChecked: Pick<Task, "id" | "isChecked" | "updatedAt"> }>(
-        SET_TASK_IS_CHECKED,
-        { id: task.id, isChecked: !task.isChecked }
-      );
-      await loadTasks(); // keep client in sync with server timestamps
-    } catch (e) {
-      // rollback by refetch
-      await loadTasks();
-      setError(e instanceof Error ? e.message : "Unknown error");
-    }
-  }
-
-  async function toggleCompleted(task: Task) {
-    setTasks((prev) =>
-      prev
-        ? prev.map((t) =>
-          t.id === task.id ? { ...t, completed: !t.completed } : t
-        )
-        : prev
-    );
-
-    try {
-      await fetchGraphQL<{ setTaskCompleted: Pick<Task, "id" | "completed" | "completedAt" | "updatedAt"> }>(
-        SET_TASK_COMPLETED,
-        { id: task.id, completed: !task.completed }
-      );
-      await loadTasks();
-    } catch (e) {
-      await loadTasks();
-      setError(e instanceof Error ? e.message : "Unknown error");
-    }
-  }
-
-  async function incrementCount(task: Task, by = 1) {
-    setTasks((prev) =>
-      prev
-        ? prev.map((t) =>
-          t.id === task.id
-            ? { ...t, currentCount: (t.currentCount ?? 0) + by }
-            : t
-        )
-        : prev
-    );
-
-    try {
-      await fetchGraphQL<{ incrementTaskCurrentCount: Pick<Task, "id" | "currentCount" | "updatedAt"> }>(
-        INCREMENT_TASK_CURRENT_COUNT,
-        { id: task.id, by }
-      );
-      await loadTasks();
-    } catch (e) {
-      await loadTasks();
-      setError(e instanceof Error ? e.message : "Unknown error");
-    }
-  }
-
-  async function createTask() {
-    const desc = newDesc.trim();
-    const pid = newProjectId.trim();
-    if (!desc || !pid) return;
-
-    const estimatedCount =
-      newEstimated.trim() === "" ? null : Number(newEstimated);
-
-    try {
-      await fetchGraphQL<{ createTask: Task }>(CREATE_TASK, {
-        projectId: pid,
-        description: desc,
-        estimatedCount: Number.isFinite(estimatedCount as number)
-          ? (estimatedCount as number)
-          : null,
-      });
-
-      setNewDesc("");
-      setNewEstimated("");
-      await loadTasks();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Unknown error");
-    }
-  }
-
-  if (error) return <p>Failed to load tasks: {error}</p>;
-  if (!tasks) return <p>Loading…</p>;
-
-  return (
-    <div style={{ padding: 16, display: "grid", gap: 16 }}>
-      <h2 style={{ margin: 0 }}>Tasks</h2>
-
-      {/* simple create UI */}
-      <div style={{ display: "grid", gap: 8, maxWidth: 520 }}>
-        <input
-          placeholder="Project ID :)"
-          value={newProjectId}
-          onChange={(e) => setNewProjectId(e.target.value)}
-        />
-        <input
-          placeholder="Task description"
-          value={newDesc}
-          onChange={(e) => setNewDesc(e.target.value)}
-        />
-        <input
-          placeholder="Estimated count (optional)"
-          value={newEstimated}
-          onChange={(e) => setNewEstimated(e.target.value)}
-          inputMode="numeric"
-        />
-        <button onClick={createTask} disabled={!newProjectId.trim() || !newDesc.trim()}>
-          Create task
-        </button>
-      </div>
-
-      {tasks.length === 0 ? (
-        <p>No tasks yet.</p>
-      ) : (
-        <ul style={{ display: "grid", gap: 12, paddingLeft: 18 }}>
-          {tasks.map((t) => (
-            <li key={t.id} style={{ display: "grid", gap: 6 }}>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <strong>{t.description}</strong>
-                <span>{t.completed ? "✅" : t.isChecked ? "☑️" : "⬜"}</span>
-
-                <button onClick={() => toggleChecked(t)}>
-                  {t.isChecked ? "Uncheck" : "Check"}
-                </button>
-
-                <button onClick={() => toggleCompleted(t)}>
-                  {t.completed ? "Mark active" : "Complete"}
-                </button>
-
-                <button onClick={() => incrementCount(t, 1)}>+1</button>
-              </div>
-
-              <div style={{ fontSize: 12, opacity: 0.8 }}>
-                Project: {t.projectId} • Count: {t.currentCount ?? 0}/
-                {t.estimatedCount ?? "?"} • Updated:{" "}
-                {new Date(t.updatedAt).toLocaleString()}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
+import TomodoControlBar from "@/components/TomodoControlBar";
+import SessionPanel from "@/components/TomodoControlBar/SessionPanel";
+import TomodoTaskInput from "@/components/TomodoTaskInput";
+import TomodoTaskList from "@/components/TomodoTaskList";
+import { TaskProvider } from "@/contexts/TaskProvider";
+import { useModal } from "@/hooks/useModal";
+import { PomoCount } from "@/components/shared/ui/PomoCount";
+import PauseIcon from "@/svgs/PauseIcon";
+import CloseIcon from "@/svgs/CloseIcon";
 
 function App() {
+  const { open, hide, toggle } = useModal();
+  const [flipped, setFlipped] = useState(true);
+
+  const startPomodoro = () => setFlipped(true);
+  const stopPomodoro = () => setFlipped(false);
+
+  const sceneClass = classNames(
+    "perspective-distant",
+    "w-180"
+  );
+
+  const cardClass = classNames(
+    "relative",
+    "transition-transform",
+    "duration-500",
+    "ease-out",
+    "transform-3d",
+    {
+      "transform-[rotateY(180deg)]": flipped,
+    }
+  );
+
+  const faceBaseClass = classNames(
+    "flex",
+    "flex-col",
+    "gap-y-4.5",
+    "rounded-md",
+    "bg-white",
+    "p-6",
+    "border",
+    "border-[#3C1E11]",
+    "backface-hidden",
+    "[webkit-backface-visibility:hidden]"
+  );
+
+  const frontFaceClass = classNames(
+    "relative",
+    faceBaseClass
+  );
+
+  const backFaceClass = classNames(
+    "absolute",
+    "inset-0",
+    "transform-[rotateY(180deg)]",
+    faceBaseClass
+  );
+
+
   return (
-    <Suspense fallback={<p>Loading…</p>}>
-      <Tasks />
-    </Suspense>
+    <main className="min-h-screen w-full flex bg-[#FFD8B5] font-inter">
+      <div className="flex-1 flex items-center justify-center flex-col">
+        <div className={sceneClass}>
+          <div className={cardClass}>
+
+            {/* FRONT */}
+            <div className={frontFaceClass}>
+              <TaskProvider>
+                <TomodoTaskInput />
+                <TomodoTaskList />
+                <TomodoControlBar
+                  startPomodoro={startPomodoro}
+                  togglePanel={toggle}
+                />
+                <SessionPanel open={open} hide={hide} />
+              </TaskProvider>
+            </div>
+
+            {/* BACK */}
+            <div className={backFaceClass}>
+              <div className="flex grow items-center justify-between flex-col">
+                <div className="flex flex-col flex-1 w-full items-center gap-y-6">
+                  <div className="flex items-end gap-x-2">
+                    <p className="text-8xl font-semibold text-outline text-">14:32</p>
+                    <div className="flex gap-x-1 mb-3">
+                      <div className="h-6 w-2 border rounded-full bg-primary" />
+                      <div className="h-6 w-2 border rounded-full bg-primary" />
+                      <div className="h-6 w-2 border rounded-full" />
+                      <div className="h-6 w-2 border rounded-full" />
+                    </div>
+                  </div>
+                  <div className="px-11.5 w-full flex items-center justify-center">
+                    <div className="border border-outline bg-primary-muted p-4 w-full rounded-md">
+                      <p className="font-medium text-sm mb-3 text-outline">Session Tasks</p>
+                      <ul>
+                        <li className="flex py-1 px-2 items-baseline">
+                          <PomoCount estimated={4} current={1} />
+                          <span className=" font-light text-outline leading-[150%] ml-2">
+                            Creating and maintaining system architecture docs.
+                          </span>
+                        </li>
+                        <li className="flex py-1 px-2 items-baseline">
+                          <PomoCount estimated={4} current={2} />
+                          <span className=" font-light text-outline  leading-[150%] ml-2">
+                            Implementing automated tests for integration and E2E scenarios.
+                          </span>
+                        </li>
+                        <li className="flex py-1 px-2 items-baseline">
+                          <PomoCount estimated={4} current={8} />
+                          <span className=" font-light text-outline leading-[150%] ml-2">
+                            Designing scalable microservices architectures.
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <button className="px-3 py-1.5 rounded-full border border-outline bg-primary mx-0.5"><PauseIcon /></button>
+                  <button className="px-3 py-1.5 rounded-full border border-outline bg-primary mx-0.5" onClick={stopPomodoro}> <CloseIcon /></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
 

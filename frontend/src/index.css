@@ -1,0 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import "tailwindcss";
+
+@utility font-inter {
+  font-family: var(--font-inter);
+}
+
+@theme {
+  --color-primary: #ffdea2;
+  --color-primary-muted: #fff4df;
+  --color-primary-hover: #fdfaf5;
+  --color-secondary-hover: #dff4ff;
+  --color-outline: #3c1e11;
+  --font-inter: "Inter", system-ui, sans-serif;
+}

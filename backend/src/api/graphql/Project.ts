@@ -7,7 +7,7 @@
 // - createdAt
 // - updatedAt
 
-import { objectType } from "nexus";
+import { mutationField, objectType } from "nexus";
 export const Project = objectType({
   name: "Project",
   definition(t) {
@@ -19,4 +19,11 @@ export const Project = objectType({
       t.field("createdAt", { type: "DateTime" }),
       t.field("updatedAt", { type: "DateTime" });
   },
+});
+
+export const ProjectMutation = mutationField((t) => {
+  t.field("createProject", {
+    type: "Project",
+    resolve(_parent, _args, ctx) {},
+  });
 });

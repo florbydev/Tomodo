@@ -13,6 +13,7 @@ lerna-debug.log*
 **/TODOS
 dist-ssr
 *.local
+**/.prod.env
 
 # Editor directories and files
 .vscode/*
