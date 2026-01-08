@@ -3,8 +3,7 @@ import type { ProjectType } from "@/components/types";
 import useOutsideClick from "@/hooks/useOutsideClick";
 import Filter from "@/svgs/Filter";
 import { createContext, useRef, useState } from "react";
-import { GoBriefcase } from "react-icons/go";
-import { MdArrowDropDown, MdKeyboardArrowDown, MdOutlineFilter } from "react-icons/md";
+import { MdKeyboardArrowDown } from "react-icons/md";
 
 type RootProps = {
   children?: React.ReactNode;

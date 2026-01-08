@@ -47,7 +47,7 @@ const TomodoTaskList = () => {
   }
 
   return (
-    <div className="flex justify-between flex-col gap-y-3 pb-4 border-b border-b-outline">
+    <div className="flex justify-start flex-col gap-y-3 pb-4 border-b border-b-outline flex-1 overflow-auto">
       <div className="flex items-center justify-between ml-2">
         <div>
           {
