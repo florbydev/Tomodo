@@ -1,6 +1,41 @@
-export * from "./Task";
-export * from "./MusicTrack";
-export * from "./Project";
-export * from "./Session";
-export * from "./User";
-export * from "./UserPrefs";
+import { User, UserMutation, UpdatePomodoroPrefsInput } from "./User";
+import {
+  Project,
+  ProjectMutation,
+  CreateProjectInput,
+  ProjectQuery,
+} from "./Project";
+import { Task, TaskQuery, TaskMutation, CreateTaskInput } from "./Task";
+import {
+  SessionInfo,
+  SessionMutation,
+  StartSessionInput,
+  PauseSessionInput,
+  EndSessionInput,
+} from "./SesssionInfo";
+import { SessionTask } from "./SessionTask";
+
+export const graphqlTypes = [
+  // object types
+  User,
+  Project,
+  Task,
+  SessionInfo,
+  SessionTask,
+
+  // inputs
+  CreateTaskInput,
+  CreateProjectInput,
+  StartSessionInput,
+  PauseSessionInput,
+  EndSessionInput,
+  UpdatePomodoroPrefsInput,
+
+  // query/mutation extensions
+  TaskQuery,
+  TaskMutation,
+  ProjectQuery,
+  ProjectMutation,
+  SessionMutation,
+  UserMutation,
+];

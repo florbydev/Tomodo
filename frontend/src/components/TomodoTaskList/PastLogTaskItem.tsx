@@ -24,12 +24,12 @@ export function PastLogTaskItem({ item, onClick }: Props) {
           <ReturnIcon />
         </button>
         <PomoCount
-          current={item.currentCount}
-          estimated={item.estimatedCount}
+          current={item.completed_sessions}
+          estimated={item.target_sessions}
         />
         <Badge label={item.project.name} backgroundColor={item.project.color} />
         <p className="text-outline font-light text-base leading-[150%]">
-          {item.description}
+          {item.title}
         </p>
       </label>
     </li>

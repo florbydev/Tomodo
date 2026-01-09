@@ -27,11 +27,11 @@ const TomodoControlBar = ({ togglePanel, startPomodoro }: Props) => {
     bg-clip-text text-transparent
   "
         >
-          {sessionTasks.length > 0 ? sessionTasks[0].description : 'Nothing to add here...'}
+          {sessionTasks.length > 0 ? sessionTasks[0].title : 'Nothing to add here...'}
         </p>
       </div>
       <div className="flex items-center justify-center gap-x-4">
-        <button onClick={startPomodoro} className="border border-outline rounded-full px-3 py-1.5 bg-primary text-outline font-medium text-sm whitespace-nowrap">Start Pomodoro(25/5)</button>
+        <button onClick={startPomodoro} className="border border-outline rounded-full px-3 py-1.5 bg-primary text-outline font-medium text-sm whitespace-nowrap" disabled={sessionTasks.length <= 0}>Start Pomodoro(25/5)</button>
         <div className="flex items-center justify-center gap-x-4">
           <MusicIcon />
           <SettingsIcon />

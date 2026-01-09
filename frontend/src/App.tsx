@@ -24,7 +24,7 @@ function App() {
   const cardClass = classNames(
     "relative",
     "transition-transform",
-    "duration-500",
+    "duration-600",
     "ease-out",
     "transform-3d",
     {

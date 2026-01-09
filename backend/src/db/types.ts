@@ -1,91 +1,130 @@
 import type { ColumnType, Insertable, Selectable, Updateable } from "kysely";
 
-export type SessionStatus = "running" | "paused" | "ended";
-export type SessionCountAction = "PAUSE" | "END";
-export type PomoPhase = "focus" | "short_break" | "long_break";
-
-type Timestamp = ColumnType<Date, Date | string | null, Date | string | null>;
+/**
+ * UUID (Universally Unique Identifier)
+ */
 type UUID = string;
 
+/**
+ * Timestamp columns:
+ * - Select: Date
+ * - Insert/Update: Date | string | null (lets you pass ISO strings or Date)
+ */
+type Timestamp = ColumnType<Date, Date | string | null, Date | string | null>;
+
+/**
+ * SessionStatus: matches session_info.status in your tables
+ */
+export type SessionStatus = "running" | "paused" | "completed" | "canceled";
+
+/**
+ * SessionType: matches session_info.session_type in your tables
+ */
+export type SessionType = "focus" | "break" | "long_break";
+
 export interface UsersTable {
-  id: UUID; // if you generate server-side, keep as UUID; if DB generates, use Generated<UUID>
-  name: string | null;
-  email: string | null;
-  createdAt: Timestamp | null;
-  updatedAt: Timestamp | null;
+  id: UUID;
+
+  email: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  timezone: string; // default "UTC"
+
+  // default pomodoro settings
+  default_focus_minutes: number;
+  default_break_minutes: number;
+  default_long_break_minutes: number;
+  long_break_every: number;
+
+  created_at: Timestamp;
+  updated_at: Timestamp;
 }
 
 export interface ProjectsTable {
   id: UUID;
-  userId: UUID;
+  user_id: UUID;
+
   name: string;
-  description: string | null;
+  icon: string | null;
   color: string | null;
-  createdAt: Timestamp | null;
-  updatedAt: Timestamp | null;
+  is_archived: boolean;
+
+  created_at: Timestamp;
+  updated_at: Timestamp;
 }
 
 export interface TasksTable {
   id: UUID;
-  projectId: UUID;
-  description: string;
-  estimatedCount: number | null;
-  currentCount: number | null;
-  createdAt: Timestamp | null;
-  updatedAt: Timestamp | null;
-  isChecked: boolean | null;
-  completed: boolean | null;
-  completedAt: Timestamp | null;
-}
+  user_id: UUID;
+  project_id: UUID | null; // nullable: inbox tasks
 
-export interface SessionsTable {
-  id: UUID;
-  userId: UUID;
-  sessionCount: SessionCountAction | null;
-  sessionStatus: SessionStatus | null;
-  actualFocusTime: number | null;
-  actualBreakTime: number | null;
-  sessionFocusTime: number | null;
-  sessionBreakTime: number | null;
-  startedAt: Timestamp | null;
-  pausedAt: Timestamp | null;
-  endedAt: Timestamp | null;
-}
-
-export interface PersonalPrefsTable {
-  userId: UUID;
-  darkMode: boolean | null;
-}
-
-export interface PomoPrefsTable {
-  userId: UUID;
-  focusTime: number | null;
-  breakTime: number | null;
-  longBreakTime: number | null;
-  longBreakInterval: number | null;
-}
-
-export interface MusicTracksTable {
-  id: UUID;
   title: string;
-  artist: string | null;
-  durationSeconds: number | null;
-  audioUrl: string | null;
-  coverImageUrl: string | null;
-  isLoopable: boolean | null;
+  notes: string | null;
+
+  target_sessions: number;
+  completed_sessions: number;
+
+  is_completed: boolean;
+  completed_at: Timestamp | null;
+
+  sort_order: number | null;
+  is_archived: boolean;
+
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+export interface SessionInfoTable {
+  id: UUID;
+  user_id: UUID;
+
+  session_type: SessionType;
+  planned_duration_seconds: number;
+  actual_duration_seconds: number | null;
+
+  status: SessionStatus; // default "completed"
+  started_at: Timestamp;
+  ended_at: Timestamp | null;
+
+  cycle_index: number | null;
+  created_at: Timestamp;
+}
+
+export interface SessionTasksTable {
+  session_id: UUID;
+  task_id: UUID;
+
+  sort_order: number | null;
+  seconds_spent: number | null;
+
+  created_at: Timestamp;
 }
 
 export interface Database {
   users: UsersTable;
   projects: ProjectsTable;
   tasks: TasksTable;
-  sessions: SessionsTable;
-  personal_prefs: PersonalPrefsTable;
-  pomo_prefs: PomoPrefsTable;
-  music_tracks: MusicTracksTable;
+  session_info: SessionInfoTable;
+  session_tasks: SessionTasksTable;
 }
 
-// Optional convenience types per table
+/* Optional convenience types per table */
 export type User = Selectable<UsersTable>;
 export type NewUser = Insertable<UsersTable>;
 export type UserUpdate = Updateable<UsersTable>;
+
+export type Project = Selectable<ProjectsTable>;
+export type NewProject = Insertable<ProjectsTable>;
+export type ProjectUpdate = Updateable<ProjectsTable>;
+
+export type Task = Selectable<TasksTable>;
+export type NewTask = Insertable<TasksTable>;
+export type TaskUpdate = Updateable<TasksTable>;
+
+export type SessionInfo = Selectable<SessionInfoTable>;
+export type NewSessionInfo = Insertable<SessionInfoTable>;
+export type SessionInfoUpdate = Updateable<SessionInfoTable>;
+
+export type SessionTask = Selectable<SessionTasksTable>;
+export type NewSessionTask = Insertable<SessionTasksTable>;
+export type SessionTaskUpdate = Updateable<SessionTasksTable>;

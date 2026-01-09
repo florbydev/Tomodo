@@ -25,9 +25,9 @@ const SessionPanel = ({ open, hide }: Props) => {
           {
             sessionTasks.map(task => {
               return (<li id={task.id} className="flex py-1 px-2 items-baseline">
-                <PomoCount estimated={task.estimatedCount} current={task.currentCount} />
+                <PomoCount estimated={task.target_sessions} current={task.completed_sessions} />
                 <span className="font-light text-outline leading-[150%] ml-2">
-                  {task.description}
+                  {task.title}
                 </span>
               </li>)
             })

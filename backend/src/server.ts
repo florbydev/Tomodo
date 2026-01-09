@@ -41,7 +41,10 @@ export function buildServer(): {
   server.register(mercurius, {
     schema,
     graphiql: true,
-    context: async () => ({ db }),
+    context: async () => ({
+      db,
+      userId: "11111111-1111-1111-1111-111111111111",
+    }),
   });
 
   server.get("/ping", async () => "pongpong\n");

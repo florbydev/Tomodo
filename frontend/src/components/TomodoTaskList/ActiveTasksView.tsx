@@ -35,6 +35,8 @@ const ActiveTasksView = ({ activeTasks, sessionTasks, setSessionTasks }: Props) 
       "
     >
       {activeTasks.map((item) => {
+        console.log('sessionTasks', sessionTasks);
+
         const isChecked = sessionTasks.some(task => task.id === item.id)
 
         return (
@@ -43,8 +45,10 @@ const ActiveTasksView = ({ activeTasks, sessionTasks, setSessionTasks }: Props) 
             item={item}
             checked={isChecked}
             onCheckedChange={() => {
+              console.log('checking checkmark');
+
               if (isChecked) {
-                console.log('checked', isChecked);
+                console.log('checked', isChecked, item.id);
 
                 (
                   setSessionTasks(prev => prev.filter((value) => value.id !== item.id))

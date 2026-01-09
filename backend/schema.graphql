@@ -2,91 +2,124 @@
 ### Do not make changes to this file directly
 
 
+input CreateProjectInput {
+  color: String
+  icon: String
+  name: String!
+}
+
+input CreateTaskInput {
+  notes: String
+  project_id: ID
+  sort_order: Int
+  target_sessions: Int
+  title: String!
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
 
-type MusicTrack {
-  artistName: String!
-  audioUrl: String!
-  coverImageUrl: String!
-  durationSeconds: Int!
-  id: ID!
-  isLoopable: Boolean
-  title: String!
+input EndSessionInput {
+  actual_duration_seconds: Int
+  session_id: ID!
+  status: String
 }
 
 type Mutation {
-  createProject: Project
-  createTask(currentCount: Int, description: String!, estimatedCount: Int, projectId: ID!): Task!
-  incrementTaskCurrentCount(by: Int, id: ID!): Task!
-  removeTask(id: ID!): Task!
-  setTaskCompleted(completed: Boolean!, id: ID!): Task!
-  setTaskCurrentCount(currentCount: Int!, id: ID!): Task!
-  setTaskIsChecked(id: ID!, isChecked: Boolean!): Task!
+  createProject(input: CreateProjectInput!): Project!
+  createTask(input: CreateTaskInput!): Task!
+  endSession(input: EndSessionInput!): SessionInfo!
+  pauseSession(input: PauseSessionInput!): SessionInfo!
+  startSession(input: StartSessionInput!): SessionInfo!
+  updatePomodoroPrefs(input: UpdatePomodoroPrefsInput!): User!
+}
+
+input PauseSessionInput {
+  session_id: ID!
 }
 
 type Project {
-  color: String!
-  createdAt: DateTime
-  description: String!
+  color: String
+  created_at: DateTime!
+  icon: String
   id: ID!
+  is_archived: Boolean!
   name: String!
-  updatedAt: DateTime
-  userId: ID!
+  updated_at: DateTime!
+  user_id: ID!
 }
 
 type Query {
-  activeTask: [Task]
+  active_tasks: [Task!]!
+  past_logs: [Task!]!
+  projects: [Project!]!
+  tasks: [Task!]!
+  tasksByProjectId(project_id: ID!): [Task!]!
 }
 
-type Session {
-  actualBreakTime: Int!
-  actualFocusTime: Int!
-  createdAt: DateTime
-  endedAt: DateTime
-  pausedAt: DateTime
-  sessionBreakTime: Int!
-  sessionCount: Int!
-  sessionFocusTime: Int!
-  sessionStatus: SessionStatus!
-  userId: ID!
+type SessionInfo {
+  actual_duration_seconds: Int
+  created_at: DateTime!
+  cycle_index: Int
+  ended_at: DateTime
+  id: ID!
+  planned_duration_seconds: Int!
+  session_type: String!
+  started_at: DateTime!
+  status: String!
+  user_id: ID!
 }
 
-enum SessionStatus {
-  END
-  PAUSE
-  PLAY
-  RUNNING
+type SessionTask {
+  created_at: DateTime!
+  seconds_spent: Int
+  session_id: ID!
+  sort_order: Int
+  task_id: ID!
+}
+
+input StartSessionInput {
+  cycle_index: Int
+  planned_duration_seconds: Int!
+  session_type: String!
 }
 
 type Task {
-  completed: Boolean
-  completedAt: DateTime
-  createdAt: DateTime
-  currentCount: Int
-  description: String!
-  estimatedCount: Int
+  completed_at: DateTime
+  completed_sessions: Int!
+  created_at: DateTime!
   id: ID!
-  isChecked: Boolean
-  projectId: ID!
-  updatedAt: DateTime
+  is_archived: Boolean!
+  is_completed: Boolean!
+  notes: String
+  project: Project
+  project_id: ID
+  sort_order: Int
+  target_sessions: Int!
+  title: String!
+  updated_at: DateTime!
+  user_id: ID!
+}
+
+input UpdatePomodoroPrefsInput {
+  default_break_minutes: Int
+  default_focus_minutes: Int
+  default_long_break_minutes: Int
+  long_break_every: Int
 }
 
 type User {
-  createdAt: DateTime
+  avatar_url: String
+  created_at: DateTime!
+  default_break_minutes: Int!
+  default_focus_minutes: Int!
+  default_long_break_minutes: Int!
+  display_name: String
   email: String!
   id: ID!
-  name: String!
-  updatedAt: DateTime
-}
-
-type UserPrefs {
-  breakTime: Int!
-  darkMode: Boolean!
-  focusTime: Int!
-  longBreakInterval: Int!
-  longBreakTime: Int!
-  userId: ID!
+  long_break_every: Int!
+  timezone: String!
+  updated_at: DateTime!
 }

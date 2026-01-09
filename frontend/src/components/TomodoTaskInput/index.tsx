@@ -16,7 +16,7 @@ type FormValues = {
 };
 
 const TomodoTaskInput = (): JSX.Element => {
-  const { setActiveTasks, projectList } = useTask();
+  const { onTaskCreate, projectList } = useTask();
 
   const initialValue = useMemo(() => {
     return {
@@ -31,22 +31,22 @@ const TomodoTaskInput = (): JSX.Element => {
 
 
   return (
-    <form onSubmit={(e) => {
+    <form onSubmit={async (e) => {
       e.preventDefault();
 
-      const tempId = 'temp-' + crypto.randomUUID();
-      const tempUserId = 'nothingham-123';
+      // const tempId = 'temp-' + crypto.randomUUID();
+      // const tempUserId = 'nothingham-123';
 
-      setActiveTasks(prev => [{
-        id: tempId,
-        userId: tempUserId,
-        project: values.project,
-        completed: false,
-        description: values.task,
-        estimatedCount: values.pomoCount,
-        currentCount: 0
-      }, ...prev])
-
+      // setActiveTasks(prev => [{
+      //   id: tempId,
+      //   userId: tempUserId,
+      //   project: values.project,
+      //   completed: false,
+      //   description: values.task,
+      //   estimatedCount: values.pomoCount,
+      //   currentCount: 0
+      // }, ...prev])
+      await onTaskCreate(values.task, values.pomoCount, values.project)
       setValues(initialValue)
 
     }} className="flex items-center gap-3 border-b border-outline py-1.5">

@@ -1,228 +1,154 @@
-import { DateTimeResolver } from "graphql-scalars";
-import {
-  asNexusMethod,
-  booleanArg,
-  idArg,
-  intArg,
-  list,
-  mutationField,
-  nonNull,
-  objectType,
-  queryField,
-  stringArg,
-} from "nexus";
-import { randomUUID } from "node:crypto";
+import { extendType, inputObjectType, nonNull, objectType, idArg } from "nexus";
 
-export const DateTime = asNexusMethod(DateTimeResolver, "date");
-
-export const TaskType = objectType({
+// ---- Type ----
+export const Task = objectType({
   name: "Task",
   definition(t) {
     t.nonNull.id("id");
-    t.nonNull.id("projectId");
-    t.nonNull.string("description");
-    t.int("estimatedCount");
-    t.int("currentCount");
-    t.field("createdAt", { type: "DateTime" });
-    t.field("updatedAt", { type: "DateTime" });
-    t.field("completedAt", { type: "DateTime" });
-    t.boolean("isChecked");
-    t.boolean("completed");
+    t.nonNull.id("user_id");
+    t.id("project_id");
+
+    t.field("project", {
+      type: "Project",
+      async resolve(task, _args, ctx) {
+        if (!task.project_id) return null; // inbox task
+
+        return ctx.db
+          .selectFrom("projects")
+          .selectAll()
+          .where("id", "=", task.project_id)
+          .where("user_id", "=", ctx.userId) // security
+          .executeTakeFirst();
+      },
+    });
+
+    t.nonNull.string("title");
+    t.string("notes");
+    t.nonNull.int("target_sessions");
+    t.nonNull.int("completed_sessions");
+    t.nonNull.boolean("is_completed");
+    t.field("completed_at", { type: "DateTime" });
+    t.int("sort_order");
+    t.nonNull.boolean("is_archived");
+    t.nonNull.field("created_at", { type: "DateTime" });
+    t.nonNull.field("updated_at", { type: "DateTime" });
   },
 });
 
-export const TaskQuery = queryField((t) => {
-  t.field("activeTask", {
-    type: list("Task"),
-    async resolve(_parent, _args, ctx) {
-      return ctx.db
-        .selectFrom("tasks")
-        .select([
-          "id",
-          "description",
-          "estimatedCount",
-          "currentCount",
-          "createdAt",
-          "updatedAt",
-          "isChecked",
-          "completed",
-          "completedAt",
-          "projectId",
-        ])
-        .where("completed", "=", false)
-        .execute();
-    },
-  });
+// ---- Inputs ----
+export const CreateTaskInput = inputObjectType({
+  name: "CreateTaskInput",
+  definition(t) {
+    t.id("project_id"); // optional -> inbox task
+    t.nonNull.string("title");
+    t.string("notes");
+    t.int("target_sessions");
+    t.int("sort_order");
+  },
 });
 
-const taskSelect = [
-  "id",
-  "description",
-  "estimatedCount",
-  "currentCount",
-  "createdAt",
-  "updatedAt",
-  "isChecked",
-  "completed",
-  "completedAt",
-  "projectId",
-] as const;
-
-export const TaskMutation = mutationField((t) => {
-  t.field("createTask", {
-    type: nonNull("Task"),
-    args: {
-      projectId: nonNull(idArg()),
-      description: nonNull(stringArg()),
-      estimatedCount: intArg(),
-      currentCount: intArg(),
-    },
-    async resolve(_parent, args, ctx) {
-      const now = new Date();
-      const created = await ctx.db
-        .insertInto("tasks")
-        .values({
-          id: randomUUID(),
-          projectId: args.projectId,
-          description: args.description,
-          estimatedCount: args.estimatedCount ?? null,
-          currentCount: args.currentCount ?? 0,
-          isChecked: false,
-          completed: false,
-          completedAt: null,
-          createdAt: now,
-          updatedAt: now,
-        })
-        .returning(taskSelect)
-        .executeTakeFirst();
-
-      if (!created) throw new Error("Failed to create task");
-      return created;
-    },
-  });
-
-  t.field("setTaskIsChecked", {
-    type: nonNull("Task"),
-    args: {
-      id: nonNull(idArg()),
-      isChecked: nonNull(booleanArg()),
-    },
-    async resolve(_parent, args, ctx) {
-      const updated = await ctx.db
-        .updateTable("tasks")
-        .set({
-          isChecked: args.isChecked,
-          updatedAt: new Date(),
-        })
-        .where("id", "=", args.id)
-        .returning(taskSelect)
-        .executeTakeFirst();
-
-      if (!updated) throw new Error("Task not found");
-      return updated;
-    },
-  });
-
-  t.field("setTaskCompleted", {
-    type: nonNull("Task"),
-    args: {
-      id: nonNull(idArg()),
-      completed: nonNull(booleanArg()),
-    },
-    async resolve(_parent, args, ctx) {
-      const now = new Date();
-
-      const updated = await ctx.db
-        .updateTable("tasks")
-        .set({
-          completed: args.completed,
-          completedAt: args.completed ? now : null,
-          updatedAt: now,
-        })
-        .where("id", "=", args.id)
-        .returning(taskSelect)
-        .executeTakeFirst();
-
-      if (!updated) throw new Error("Task not found");
-      return updated;
-    },
-  });
-
-  t.field("setTaskCurrentCount", {
-    type: nonNull("Task"),
-    args: {
-      id: nonNull(idArg()),
-      currentCount: nonNull(intArg()),
-    },
-    async resolve(_parent, args, ctx) {
-      if (args.currentCount < 0) {
-        throw new Error("currentCount cannot be negative");
-      }
-
-      const updated = await ctx.db
-        .updateTable("tasks")
-        .set({
-          currentCount: args.currentCount,
-          updatedAt: new Date(),
-        })
-        .where("id", "=", args.id)
-        .returning(taskSelect)
-        .executeTakeFirst();
-
-      if (!updated) throw new Error("Task not found");
-      return updated;
-    },
-  });
-
-  t.field("incrementTaskCurrentCount", {
-    type: nonNull("Task"),
-    args: {
-      id: nonNull(idArg()),
-      by: intArg(), // default 1
-    },
-    async resolve(_parent, args, ctx) {
-      const by = args.by ?? 1;
-      if (by === 0) {
-        // no-op, but still return current task
-        const task = await ctx.db
+// ---- Queries ----
+export const TaskQuery = extendType({
+  type: "Query",
+  definition(t) {
+    t.nonNull.list.nonNull.field("tasks", {
+      type: "Task",
+      async resolve(_root, _args, ctx) {
+        return ctx.db
           .selectFrom("tasks")
-          .select(taskSelect)
-          .where("id", "=", args.id)
-          .executeTakeFirst();
-        if (!task) throw new Error("Task not found");
-        return task;
-      }
+          .selectAll()
+          .where("user_id", "=", ctx.userId)
+          .where("is_archived", "=", false)
+          .orderBy("sort_order", "asc")
+          .orderBy("created_at", "desc")
+          .execute();
+      },
+    });
 
-      // Kysely expression builder to do currentCount = currentCount + by
-      const updated = await ctx.db
-        .updateTable("tasks")
-        .set((eb: (arg0: string, arg1: string, arg2: any) => any) => ({
-          currentCount: eb("currentCount", "+", by),
-          updatedAt: new Date(),
-        }))
-        .where("id", "=", args.id)
-        .returning(taskSelect)
-        .executeTakeFirst();
+    t.nonNull.list.nonNull.field("active_tasks", {
+      type: "Task",
+      async resolve(_root, _args, ctx) {
+        return ctx.db
+          .selectFrom("tasks")
+          .selectAll()
+          .where("user_id", "=", ctx.userId)
+          .where("is_archived", "=", false)
+          .where("is_completed", "=", false)
+          .orderBy("sort_order", "asc")
+          .orderBy("created_at", "desc")
+          .execute();
+      },
+    });
 
-      if (!updated) throw new Error("Task not found");
-      return updated;
-    },
-  });
+    t.nonNull.list.nonNull.field("past_logs", {
+      type: "Task",
+      async resolve(_root, _args, ctx) {
+        return ctx.db
+          .selectFrom("tasks")
+          .selectAll()
+          .where("user_id", "=", ctx.userId)
+          .where("is_archived", "=", false)
+          .where("is_completed", "=", true)
+          .orderBy("sort_order", "asc")
+          .orderBy("created_at", "desc")
+          .execute();
+      },
+    });
 
-  t.field("removeTask", {
-    type: nonNull("Task"),
-    args: {
-      id: nonNull(idArg()),
-    },
-    async resolve(_parent, args, ctx) {
-      const deleted = await ctx.db
-        .deleteFrom("tasks")
-        .where("id", "=", args.id)
-        .returning(taskSelect)
-        .executeTakeFirst();
+    t.nonNull.list.nonNull.field("tasksByProjectId", {
+      type: "Task",
+      args: {
+        project_id: nonNull(idArg()),
+      },
+      async resolve(_root, args, ctx) {
+        return ctx.db
+          .selectFrom("tasks")
+          .selectAll()
+          .where("user_id", "=", ctx.userId)
+          .where("project_id", "=", args.project_id)
+          .where("is_archived", "=", false)
+          .orderBy("sort_order", "asc")
+          .orderBy("created_at", "desc")
+          .execute();
+      },
+    });
+  },
+});
 
-      if (!deleted) throw new Error("Task not found");
-      return deleted;
-    },
-  });
+// ---- Mutations ----
+export const TaskMutation = extendType({
+  type: "Mutation",
+  definition(t) {
+    // create task
+    t.nonNull.field("createTask", {
+      type: "Task",
+      args: {
+        input: nonNull("CreateTaskInput"),
+      },
+      async resolve(_root, args, ctx) {
+        const now = new Date();
+
+        const insert = await ctx.db
+          .insertInto("tasks")
+          .values({
+            user_id: ctx.userId,
+            project_id: args.input.project_id ?? null,
+            title: args.input.title,
+            notes: args.input.notes ?? null,
+            target_sessions: args.input.target_sessions ?? 1,
+            completed_sessions: 0,
+            is_completed: false,
+            completed_at: null,
+            sort_order: args.input.sort_order ?? null,
+            is_archived: false,
+            created_at: now,
+            updated_at: now,
+          })
+          .returningAll()
+          .executeTakeFirstOrThrow();
+
+        return insert;
+      },
+    });
+  },
 });

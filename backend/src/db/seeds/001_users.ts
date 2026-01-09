@@ -1,0 +1,261 @@
+import { Kysely, sql } from "kysely";
+import type { Database } from "../types";
+
+export async function seed(db: Kysely<Database>) {
+  // Projects
+
+  try {
+    await db
+      .insertInto("tasks")
+      .values([
+        {
+          id: "11110001-0001-4001-8001-000000000001",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b111-1111-4111-8111-111111111111",
+          title: "Plan day",
+          notes: "Outline top 3 priorities",
+          target_sessions: 1,
+          completed_sessions: 1,
+          is_completed: true,
+          completed_at: sql`now()`,
+          sort_order: 1,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+        {
+          id: "11110002-0002-4002-8002-000000000002",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b111-1111-4111-8111-111111111111",
+          title: "Inbox zero",
+          notes: null,
+          target_sessions: 1,
+          completed_sessions: 0,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 2,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+
+        // Project: Tomodo
+        {
+          id: "11110003-0003-4003-8003-000000000003",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b111-1111-4111-8111-111111111111",
+          title: "UI polish",
+          notes: "Spacing + color pass",
+          target_sessions: 3,
+          completed_sessions: 2,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 1,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+        {
+          id: "11110004-0004-4004-8004-000000000004",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b111-1111-4111-8111-111111111111",
+          title: "Task CRUD",
+          notes: "Create / update / archive",
+          target_sessions: 4,
+          completed_sessions: 4,
+          is_completed: true,
+          completed_at: sql`now()`,
+          sort_order: 2,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+
+        // Project: Challenge
+        {
+          id: "11110005-0005-4005-8005-000000000005",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b222-2222-4222-8222-222222222222",
+          title: "Schema audit",
+          notes: "Review Nexus types",
+          target_sessions: 2,
+          completed_sessions: 1,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 1,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+        {
+          id: "11110006-0006-4006-8006-000000000006",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b222-2222-4222-8222-222222222222",
+          title: "Seed data",
+          notes: "Users, projects, tasks",
+          target_sessions: 2,
+          completed_sessions: 2,
+          is_completed: true,
+          completed_at: sql`now()`,
+          sort_order: 2,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+
+        // Project: Aligned
+        {
+          id: "11110007-0007-4007-8007-000000000007",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b333-3333-4333-8333-333333333333",
+          title: "Skill map",
+          notes: "Define core domains",
+          target_sessions: 3,
+          completed_sessions: 1,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 1,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+
+        // Project: Learning
+        {
+          id: "11110008-0008-4008-8008-000000000008",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b888-8888-4888-8888-888888888888",
+          title: "Read GraphQL",
+          notes: "Spec + best practices",
+          target_sessions: 2,
+          completed_sessions: 0,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 1,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+
+        // Project: Fitness
+        {
+          id: "11110009-0009-4009-8009-000000000009",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b999-9999-4999-8999-999999999999",
+          title: "Workout",
+          notes: "Upper body",
+          target_sessions: 1,
+          completed_sessions: 1,
+          is_completed: true,
+          completed_at: sql`now()`,
+          sort_order: 1,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+
+        // Project: Writing
+        {
+          id: "11110010-0010-4010-8010-000000000010",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1c000-0000-4000-8000-000000000000",
+          title: "Draft post",
+          notes: "Systems thinking",
+          target_sessions: 2,
+          completed_sessions: 1,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 1,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+
+        // Project: Research
+        {
+          id: "11110011-0011-4011-8011-000000000011",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1c111-1111-4111-8111-111111111112",
+          title: "Read papers",
+          notes: "Learning theory",
+          target_sessions: 3,
+          completed_sessions: 0,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 1,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+
+        // Project: Planning
+        {
+          id: "11110012-0012-4012-8012-000000000012",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1c222-2222-4222-8222-222222222223",
+          title: "Weekly plan",
+          notes: "Block sessions",
+          target_sessions: 1,
+          completed_sessions: 0,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 1,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+
+        // More inbox
+        {
+          id: "11110013-0013-4013-8013-000000000013",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b111-1111-4111-8111-111111111111",
+          title: "Refactor types",
+          notes: null,
+          target_sessions: 2,
+          completed_sessions: 0,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 3,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+        {
+          id: "11110014-0014-4014-8014-000000000014",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b111-1111-4111-8111-111111111111",
+          title: "Backup DB",
+          notes: "Local snapshot",
+          target_sessions: 1,
+          completed_sessions: 1,
+          is_completed: true,
+          completed_at: sql`now()`,
+          sort_order: 4,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+        {
+          id: "11110015-0015-4015-8015-000000000015",
+          user_id: "11111111-1111-1111-1111-111111111111",
+          project_id: "a1f1b111-1111-4111-8111-111111111111",
+          title: "Clean backlog",
+          notes: null,
+          target_sessions: 1,
+          completed_sessions: 0,
+          is_completed: false,
+          completed_at: null,
+          sort_order: 5,
+          is_archived: false,
+          created_at: sql`now()`,
+          updated_at: sql`now()`,
+        },
+      ])
+      .onConflict((oc) => oc.column("id").doNothing())
+      .execute();
+  } catch (err) {
+    console.error("Project seed failed:", err);
+    process.exitCode = 1;
+  }
+}

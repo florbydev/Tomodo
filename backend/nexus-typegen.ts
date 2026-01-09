@@ -5,23 +5,8 @@
 
 
 import type { GraphQLContext } from "./src/api/context"
-import type { core } from "nexus"
-declare global {
-  interface NexusGenCustomInputMethods<TypeName extends string> {
-    /**
-     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-     */
-    date<FieldName extends string>(fieldName: FieldName, opts?: core.CommonInputFieldConfig<TypeName, FieldName>): void // "DateTime";
-  }
-}
-declare global {
-  interface NexusGenCustomOutputMethods<TypeName extends string> {
-    /**
-     * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
-     */
-    date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "DateTime";
-  }
-}
+
+
 
 
 declare global {
@@ -29,10 +14,40 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  CreateProjectInput: { // input type
+    color?: string | null; // String
+    icon?: string | null; // String
+    name: string; // String!
+  }
+  CreateTaskInput: { // input type
+    notes?: string | null; // String
+    project_id?: string | null; // ID
+    sort_order?: number | null; // Int
+    target_sessions?: number | null; // Int
+    title: string; // String!
+  }
+  EndSessionInput: { // input type
+    actual_duration_seconds?: number | null; // Int
+    session_id: string; // ID!
+    status?: string | null; // String
+  }
+  PauseSessionInput: { // input type
+    session_id: string; // ID!
+  }
+  StartSessionInput: { // input type
+    cycle_index?: number | null; // Int
+    planned_duration_seconds: number; // Int!
+    session_type: string; // String!
+  }
+  UpdatePomodoroPrefsInput: { // input type
+    default_break_minutes?: number | null; // Int
+    default_focus_minutes?: number | null; // Int
+    default_long_break_minutes?: number | null; // Int
+    long_break_every?: number | null; // Int
+  }
 }
 
 export interface NexusGenEnums {
-  SessionStatus: "END" | "PAUSE" | "PLAY" | "RUNNING"
 }
 
 export interface NexusGenScalars {
@@ -45,64 +60,64 @@ export interface NexusGenScalars {
 }
 
 export interface NexusGenObjects {
-  MusicTrack: { // root type
-    artistName: string; // String!
-    audioUrl: string; // String!
-    coverImageUrl: string; // String!
-    durationSeconds: number; // Int!
-    id: string; // ID!
-    isLoopable?: boolean | null; // Boolean
-    title: string; // String!
-  }
   Mutation: {};
   Project: { // root type
-    color: string; // String!
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    description: string; // String!
+    color?: string | null; // String
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    icon?: string | null; // String
     id: string; // ID!
+    is_archived: boolean; // Boolean!
     name: string; // String!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    userId: string; // ID!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
+    user_id: string; // ID!
   }
   Query: {};
-  Session: { // root type
-    actualBreakTime: number; // Int!
-    actualFocusTime: number; // Int!
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    endedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    pausedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    sessionBreakTime: number; // Int!
-    sessionCount: number; // Int!
-    sessionFocusTime: number; // Int!
-    sessionStatus: NexusGenEnums['SessionStatus']; // SessionStatus!
-    userId: string; // ID!
+  SessionInfo: { // root type
+    actual_duration_seconds?: number | null; // Int
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    cycle_index?: number | null; // Int
+    ended_at?: NexusGenScalars['DateTime'] | null; // DateTime
+    id: string; // ID!
+    planned_duration_seconds: number; // Int!
+    session_type: string; // String!
+    started_at: NexusGenScalars['DateTime']; // DateTime!
+    status: string; // String!
+    user_id: string; // ID!
+  }
+  SessionTask: { // root type
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    seconds_spent?: number | null; // Int
+    session_id: string; // ID!
+    sort_order?: number | null; // Int
+    task_id: string; // ID!
   }
   Task: { // root type
-    completed?: boolean | null; // Boolean
-    completedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
-    currentCount?: number | null; // Int
-    description: string; // String!
-    estimatedCount?: number | null; // Int
+    completed_at?: NexusGenScalars['DateTime'] | null; // DateTime
+    completed_sessions: number; // Int!
+    created_at: NexusGenScalars['DateTime']; // DateTime!
     id: string; // ID!
-    isChecked?: boolean | null; // Boolean
-    projectId: string; // ID!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    is_archived: boolean; // Boolean!
+    is_completed: boolean; // Boolean!
+    notes?: string | null; // String
+    project_id?: string | null; // ID
+    sort_order?: number | null; // Int
+    target_sessions: number; // Int!
+    title: string; // String!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
+    user_id: string; // ID!
   }
   User: { // root type
-    createdAt?: NexusGenScalars['DateTime'] | null; // DateTime
+    avatar_url?: string | null; // String
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    default_break_minutes: number; // Int!
+    default_focus_minutes: number; // Int!
+    default_long_break_minutes: number; // Int!
+    display_name?: string | null; // String
     email: string; // String!
     id: string; // ID!
-    name: string; // String!
-    updatedAt?: NexusGenScalars['DateTime'] | null; // DateTime
-  }
-  UserPrefs: { // root type
-    breakTime: number; // Int!
-    darkMode: boolean; // Boolean!
-    focusTime: number; // Int!
-    longBreakInterval: number; // Int!
-    longBreakTime: number; // Int!
-    userId: string; // ID!
+    long_break_every: number; // Int!
+    timezone: string; // String!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
   }
 }
 
@@ -114,178 +129,184 @@ export interface NexusGenUnions {
 
 export type NexusGenRootTypes = NexusGenObjects
 
-export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
-  MusicTrack: { // field return type
-    artistName: string; // String!
-    audioUrl: string; // String!
-    coverImageUrl: string; // String!
-    durationSeconds: number; // Int!
-    id: string; // ID!
-    isLoopable: boolean | null; // Boolean
-    title: string; // String!
-  }
   Mutation: { // field return type
-    createProject: NexusGenRootTypes['Project'] | null; // Project
+    createProject: NexusGenRootTypes['Project']; // Project!
     createTask: NexusGenRootTypes['Task']; // Task!
-    incrementTaskCurrentCount: NexusGenRootTypes['Task']; // Task!
-    removeTask: NexusGenRootTypes['Task']; // Task!
-    setTaskCompleted: NexusGenRootTypes['Task']; // Task!
-    setTaskCurrentCount: NexusGenRootTypes['Task']; // Task!
-    setTaskIsChecked: NexusGenRootTypes['Task']; // Task!
+    endSession: NexusGenRootTypes['SessionInfo']; // SessionInfo!
+    pauseSession: NexusGenRootTypes['SessionInfo']; // SessionInfo!
+    startSession: NexusGenRootTypes['SessionInfo']; // SessionInfo!
+    updatePomodoroPrefs: NexusGenRootTypes['User']; // User!
   }
   Project: { // field return type
-    color: string; // String!
-    createdAt: NexusGenScalars['DateTime'] | null; // DateTime
-    description: string; // String!
+    color: string | null; // String
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    icon: string | null; // String
     id: string; // ID!
+    is_archived: boolean; // Boolean!
     name: string; // String!
-    updatedAt: NexusGenScalars['DateTime'] | null; // DateTime
-    userId: string; // ID!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
+    user_id: string; // ID!
   }
   Query: { // field return type
-    activeTask: Array<NexusGenRootTypes['Task'] | null> | null; // [Task]
+    active_tasks: NexusGenRootTypes['Task'][]; // [Task!]!
+    past_logs: NexusGenRootTypes['Task'][]; // [Task!]!
+    projects: NexusGenRootTypes['Project'][]; // [Project!]!
+    tasks: NexusGenRootTypes['Task'][]; // [Task!]!
+    tasksByProjectId: NexusGenRootTypes['Task'][]; // [Task!]!
   }
-  Session: { // field return type
-    actualBreakTime: number; // Int!
-    actualFocusTime: number; // Int!
-    createdAt: NexusGenScalars['DateTime'] | null; // DateTime
-    endedAt: NexusGenScalars['DateTime'] | null; // DateTime
-    pausedAt: NexusGenScalars['DateTime'] | null; // DateTime
-    sessionBreakTime: number; // Int!
-    sessionCount: number; // Int!
-    sessionFocusTime: number; // Int!
-    sessionStatus: NexusGenEnums['SessionStatus']; // SessionStatus!
-    userId: string; // ID!
+  SessionInfo: { // field return type
+    actual_duration_seconds: number | null; // Int
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    cycle_index: number | null; // Int
+    ended_at: NexusGenScalars['DateTime'] | null; // DateTime
+    id: string; // ID!
+    planned_duration_seconds: number; // Int!
+    session_type: string; // String!
+    started_at: NexusGenScalars['DateTime']; // DateTime!
+    status: string; // String!
+    user_id: string; // ID!
+  }
+  SessionTask: { // field return type
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    seconds_spent: number | null; // Int
+    session_id: string; // ID!
+    sort_order: number | null; // Int
+    task_id: string; // ID!
   }
   Task: { // field return type
-    completed: boolean | null; // Boolean
-    completedAt: NexusGenScalars['DateTime'] | null; // DateTime
-    createdAt: NexusGenScalars['DateTime'] | null; // DateTime
-    currentCount: number | null; // Int
-    description: string; // String!
-    estimatedCount: number | null; // Int
+    completed_at: NexusGenScalars['DateTime'] | null; // DateTime
+    completed_sessions: number; // Int!
+    created_at: NexusGenScalars['DateTime']; // DateTime!
     id: string; // ID!
-    isChecked: boolean | null; // Boolean
-    projectId: string; // ID!
-    updatedAt: NexusGenScalars['DateTime'] | null; // DateTime
+    is_archived: boolean; // Boolean!
+    is_completed: boolean; // Boolean!
+    notes: string | null; // String
+    project: NexusGenRootTypes['Project'] | null; // Project
+    project_id: string | null; // ID
+    sort_order: number | null; // Int
+    target_sessions: number; // Int!
+    title: string; // String!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
+    user_id: string; // ID!
   }
   User: { // field return type
-    createdAt: NexusGenScalars['DateTime'] | null; // DateTime
+    avatar_url: string | null; // String
+    created_at: NexusGenScalars['DateTime']; // DateTime!
+    default_break_minutes: number; // Int!
+    default_focus_minutes: number; // Int!
+    default_long_break_minutes: number; // Int!
+    display_name: string | null; // String
     email: string; // String!
     id: string; // ID!
-    name: string; // String!
-    updatedAt: NexusGenScalars['DateTime'] | null; // DateTime
-  }
-  UserPrefs: { // field return type
-    breakTime: number; // Int!
-    darkMode: boolean; // Boolean!
-    focusTime: number; // Int!
-    longBreakInterval: number; // Int!
-    longBreakTime: number; // Int!
-    userId: string; // ID!
+    long_break_every: number; // Int!
+    timezone: string; // String!
+    updated_at: NexusGenScalars['DateTime']; // DateTime!
   }
 }
 
 export interface NexusGenFieldTypeNames {
-  MusicTrack: { // field return type name
-    artistName: 'String'
-    audioUrl: 'String'
-    coverImageUrl: 'String'
-    durationSeconds: 'Int'
-    id: 'ID'
-    isLoopable: 'Boolean'
-    title: 'String'
-  }
   Mutation: { // field return type name
     createProject: 'Project'
     createTask: 'Task'
-    incrementTaskCurrentCount: 'Task'
-    removeTask: 'Task'
-    setTaskCompleted: 'Task'
-    setTaskCurrentCount: 'Task'
-    setTaskIsChecked: 'Task'
+    endSession: 'SessionInfo'
+    pauseSession: 'SessionInfo'
+    startSession: 'SessionInfo'
+    updatePomodoroPrefs: 'User'
   }
   Project: { // field return type name
     color: 'String'
-    createdAt: 'DateTime'
-    description: 'String'
+    created_at: 'DateTime'
+    icon: 'String'
     id: 'ID'
+    is_archived: 'Boolean'
     name: 'String'
-    updatedAt: 'DateTime'
-    userId: 'ID'
+    updated_at: 'DateTime'
+    user_id: 'ID'
   }
   Query: { // field return type name
-    activeTask: 'Task'
+    active_tasks: 'Task'
+    past_logs: 'Task'
+    projects: 'Project'
+    tasks: 'Task'
+    tasksByProjectId: 'Task'
   }
-  Session: { // field return type name
-    actualBreakTime: 'Int'
-    actualFocusTime: 'Int'
-    createdAt: 'DateTime'
-    endedAt: 'DateTime'
-    pausedAt: 'DateTime'
-    sessionBreakTime: 'Int'
-    sessionCount: 'Int'
-    sessionFocusTime: 'Int'
-    sessionStatus: 'SessionStatus'
-    userId: 'ID'
+  SessionInfo: { // field return type name
+    actual_duration_seconds: 'Int'
+    created_at: 'DateTime'
+    cycle_index: 'Int'
+    ended_at: 'DateTime'
+    id: 'ID'
+    planned_duration_seconds: 'Int'
+    session_type: 'String'
+    started_at: 'DateTime'
+    status: 'String'
+    user_id: 'ID'
+  }
+  SessionTask: { // field return type name
+    created_at: 'DateTime'
+    seconds_spent: 'Int'
+    session_id: 'ID'
+    sort_order: 'Int'
+    task_id: 'ID'
   }
   Task: { // field return type name
-    completed: 'Boolean'
-    completedAt: 'DateTime'
-    createdAt: 'DateTime'
-    currentCount: 'Int'
-    description: 'String'
-    estimatedCount: 'Int'
+    completed_at: 'DateTime'
+    completed_sessions: 'Int'
+    created_at: 'DateTime'
     id: 'ID'
-    isChecked: 'Boolean'
-    projectId: 'ID'
-    updatedAt: 'DateTime'
+    is_archived: 'Boolean'
+    is_completed: 'Boolean'
+    notes: 'String'
+    project: 'Project'
+    project_id: 'ID'
+    sort_order: 'Int'
+    target_sessions: 'Int'
+    title: 'String'
+    updated_at: 'DateTime'
+    user_id: 'ID'
   }
   User: { // field return type name
-    createdAt: 'DateTime'
+    avatar_url: 'String'
+    created_at: 'DateTime'
+    default_break_minutes: 'Int'
+    default_focus_minutes: 'Int'
+    default_long_break_minutes: 'Int'
+    display_name: 'String'
     email: 'String'
     id: 'ID'
-    name: 'String'
-    updatedAt: 'DateTime'
-  }
-  UserPrefs: { // field return type name
-    breakTime: 'Int'
-    darkMode: 'Boolean'
-    focusTime: 'Int'
-    longBreakInterval: 'Int'
-    longBreakTime: 'Int'
-    userId: 'ID'
+    long_break_every: 'Int'
+    timezone: 'String'
+    updated_at: 'DateTime'
   }
 }
 
 export interface NexusGenArgTypes {
   Mutation: {
+    createProject: { // args
+      input: NexusGenInputs['CreateProjectInput']; // CreateProjectInput!
+    }
     createTask: { // args
-      currentCount?: number | null; // Int
-      description: string; // String!
-      estimatedCount?: number | null; // Int
-      projectId: string; // ID!
+      input: NexusGenInputs['CreateTaskInput']; // CreateTaskInput!
     }
-    incrementTaskCurrentCount: { // args
-      by?: number | null; // Int
-      id: string; // ID!
+    endSession: { // args
+      input: NexusGenInputs['EndSessionInput']; // EndSessionInput!
     }
-    removeTask: { // args
-      id: string; // ID!
+    pauseSession: { // args
+      input: NexusGenInputs['PauseSessionInput']; // PauseSessionInput!
     }
-    setTaskCompleted: { // args
-      completed: boolean; // Boolean!
-      id: string; // ID!
+    startSession: { // args
+      input: NexusGenInputs['StartSessionInput']; // StartSessionInput!
     }
-    setTaskCurrentCount: { // args
-      currentCount: number; // Int!
-      id: string; // ID!
+    updatePomodoroPrefs: { // args
+      input: NexusGenInputs['UpdatePomodoroPrefsInput']; // UpdatePomodoroPrefsInput!
     }
-    setTaskIsChecked: { // args
-      id: string; // ID!
-      isChecked: boolean; // Boolean!
+  }
+  Query: {
+    tasksByProjectId: { // args
+      project_id: string; // ID!
     }
   }
 }
@@ -298,9 +319,9 @@ export interface NexusGenTypeInterfaces {
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
 
-export type NexusGenInputNames = never;
+export type NexusGenInputNames = keyof NexusGenInputs;
 
-export type NexusGenEnumNames = keyof NexusGenEnums;
+export type NexusGenEnumNames = never;
 
 export type NexusGenInterfaceNames = never;
 

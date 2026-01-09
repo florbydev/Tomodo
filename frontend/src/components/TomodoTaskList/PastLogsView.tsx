@@ -1,16 +1,14 @@
 import { PastLogTaskItem } from "@/components/TomodoTaskList/PastLogTaskItem";
 import type { TaskType } from "@/components/types";
-import { useRef, useEffect, type Dispatch, type SetStateAction } from "react";
+import { useRef, useEffect } from "react";
 
 
 type Props = {
   activeTasks: Array<TaskType>;
-  setActiveTasks: Dispatch<SetStateAction<Array<TaskType>>>;
   pastLogs: Array<TaskType>;
-  setPastLogs: (value: Array<TaskType>) => void;
 }
 
-const PastLogsView = ({ activeTasks, setActiveTasks, pastLogs, setPastLogs }: Props) => {
+const PastLogsView = ({ activeTasks, pastLogs }: Props) => {
 
   const listRef = useRef<HTMLUListElement | null>(null);
 
@@ -35,8 +33,10 @@ const PastLogsView = ({ activeTasks, setActiveTasks, pastLogs, setPastLogs }: Pr
       {
         pastLogs.map(item => {
           return <PastLogTaskItem item={item} onClick={(value: TaskType) => {
-            setActiveTasks([...activeTasks, value])
-            setPastLogs(pastLogs.filter(e => e.id !== value.id))
+            console.log('someValue', value);
+
+            // setActiveTasks([...activeTasks, value])
+            // setPastLogs(pastLogs.filter(e => e.id !== value.id))
           }
           } />
         })

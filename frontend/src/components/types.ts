@@ -1,11 +1,12 @@
 export type ProjectType = {
   id: string;
-  userId: string;
+  user_id: string;
   name: string;
-  description: string;
+  icon: string;
   color: string;
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
+  is_archived: boolean;
+  created_at?: Date | null;
+  updated_at?: Date | null;
 };
 
 export type TaskInputType = {
@@ -20,14 +21,19 @@ export type TaskInputType = {
 
 export type TaskType = {
   id: string;
-  userId: string;
+  user_id: string;
+  project_id: string | null;
   project: ProjectType;
-  description: string;
-  estimatedCount: number;
-  currentCount: number;
-  completed: boolean;
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
+  title: string;
+  notes: string | null;
+  target_sessions: number;
+  completed_sessions: number;
+  is_completed: boolean;
+  completed_at: string | null;
+  sort_order: number | null;
+  is_archived: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
 export type ListItemData = {

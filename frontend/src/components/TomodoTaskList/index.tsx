@@ -16,15 +16,28 @@ export type TabState = typeof TabState[keyof typeof TabState];
 
 const TomodoTaskList = () => {
 
-  const { projectList, activeTasks, setActiveTasks, pastLogs, setPastLogs, sessionTasks, setSessionTasks } = useTask();
+  const { projectList, activeTasks, pastLogs, sessionTasks, setSessionTasks } = useTask();
   const [currentProject, setCurrentProject] = useState(projectList[0]);
+
   const filteredActiveTask = useMemo(() => {
-    return activeTasks.filter(task => task.project.id === currentProject.id)
+    if (currentProject) {
+      return activeTasks.filter(task => task.project_id === currentProject.id)
+    }
+
+    return activeTasks;
   }, [currentProject, activeTasks])
 
   const filteredPastLogs = useMemo(() => {
-    return pastLogs.filter(task => task.project.id === currentProject.id)
+    if (currentProject) {
+      return pastLogs.filter(task => task.project_id === currentProject.id)
+    }
+
+    return pastLogs;
   }, [currentProject, pastLogs])
+
+
+  console.log('active tasks', activeTasks, filteredActiveTask);
+
 
   const onProjectChange = (newProject: ProjectType) => {
     setCurrentProject(newProject);
@@ -69,9 +82,7 @@ const TomodoTaskList = () => {
 
       {currentTab == TabState.PAST_LOGS && <PastLogsView
         activeTasks={filteredActiveTask}
-        setActiveTasks={setActiveTasks}
         pastLogs={filteredPastLogs}
-        setPastLogs={setPastLogs}
       />}
       {currentTab == TabState.ACTIVE_TASKS && <ActiveTasksView
         activeTasks={filteredActiveTask}
