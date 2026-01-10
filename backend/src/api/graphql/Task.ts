@@ -1,4 +1,6 @@
+import { ExpressionBuilder } from "kysely";
 import { extendType, inputObjectType, nonNull, objectType, idArg } from "nexus";
+import { Database } from "../../db/types";
 
 // ---- Type ----
 export const Task = objectType({
@@ -44,6 +46,21 @@ export const CreateTaskInput = inputObjectType({
     t.string("notes");
     t.int("target_sessions");
     t.int("sort_order");
+  },
+});
+
+export const UpdateTasksCompletionInput = inputObjectType({
+  name: "UpdateTasksCompletionInput",
+  definition(t) {
+    t.nonNull.list.nonNull.id("task_ids");
+    t.nonNull.boolean("is_completed");
+  },
+});
+
+export const UpdateTasksCompletedSessionsInput = inputObjectType({
+  name: "UpdateTasksCompletedSessionsInput",
+  definition(t) {
+    t.nonNull.list.nonNull.id("task_ids");
   },
 });
 
@@ -148,6 +165,55 @@ export const TaskMutation = extendType({
           .executeTakeFirstOrThrow();
 
         return insert;
+      },
+    });
+    t.nonNull.list.nonNull.field("updateTasksCompletion", {
+      type: "Task",
+      args: {
+        input: nonNull("UpdateTasksCompletionInput"),
+      },
+      async resolve(_root, args, ctx) {
+        const now = new Date();
+        const { task_ids, is_completed } = args.input;
+
+        const updatedTasks = await ctx.db
+          .updateTable("tasks")
+          .set({
+            is_completed,
+            completed_at: is_completed ? now : null,
+            updated_at: now,
+          })
+          .where("id", "in", task_ids)
+          .where("user_id", "=", ctx.userId) // 🔒 security
+          .returningAll()
+          .execute();
+
+        return updatedTasks;
+      },
+    });
+    t.nonNull.list.nonNull.field("updateTasksCompletedSessions", {
+      type: "Task",
+      args: {
+        input: nonNull("UpdateTasksCompletedSessionsInput"),
+      },
+      async resolve(_root, args, ctx) {
+        const now = new Date();
+        const { task_ids } = args.input;
+
+        if (task_ids.length === 0) return [];
+
+        const updatedTasks = await ctx.db
+          .updateTable("tasks")
+          .set((eb: ExpressionBuilder<Database, "tasks">) => ({
+            completed_sessions: eb("completed_sessions", "+", 1),
+            updated_at: now,
+          }))
+          .where("id", "in", task_ids)
+          .where("user_id", "=", ctx.userId) // 🔒 security
+          .returningAll()
+          .execute();
+
+        return updatedTasks;
       },
     });
   },

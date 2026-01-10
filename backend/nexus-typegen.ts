@@ -45,6 +45,13 @@ export interface NexusGenInputs {
     default_long_break_minutes?: number | null; // Int
     long_break_every?: number | null; // Int
   }
+  UpdateTasksCompletedSessionsInput: { // input type
+    task_ids: string[]; // [ID!]!
+  }
+  UpdateTasksCompletionInput: { // input type
+    is_completed: boolean; // Boolean!
+    task_ids: string[]; // [ID!]!
+  }
 }
 
 export interface NexusGenEnums {
@@ -139,6 +146,8 @@ export interface NexusGenFieldTypes {
     pauseSession: NexusGenRootTypes['SessionInfo']; // SessionInfo!
     startSession: NexusGenRootTypes['SessionInfo']; // SessionInfo!
     updatePomodoroPrefs: NexusGenRootTypes['User']; // User!
+    updateTasksCompletedSessions: NexusGenRootTypes['Task'][]; // [Task!]!
+    updateTasksCompletion: NexusGenRootTypes['Task'][]; // [Task!]!
   }
   Project: { // field return type
     color: string | null; // String
@@ -215,6 +224,8 @@ export interface NexusGenFieldTypeNames {
     pauseSession: 'SessionInfo'
     startSession: 'SessionInfo'
     updatePomodoroPrefs: 'User'
+    updateTasksCompletedSessions: 'Task'
+    updateTasksCompletion: 'Task'
   }
   Project: { // field return type name
     color: 'String'
@@ -302,6 +313,12 @@ export interface NexusGenArgTypes {
     }
     updatePomodoroPrefs: { // args
       input: NexusGenInputs['UpdatePomodoroPrefsInput']; // UpdatePomodoroPrefsInput!
+    }
+    updateTasksCompletedSessions: { // args
+      input: NexusGenInputs['UpdateTasksCompletedSessionsInput']; // UpdateTasksCompletedSessionsInput!
+    }
+    updateTasksCompletion: { // args
+      input: NexusGenInputs['UpdateTasksCompletionInput']; // UpdateTasksCompletionInput!
     }
   }
   Query: {

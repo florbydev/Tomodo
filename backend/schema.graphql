@@ -34,6 +34,8 @@ type Mutation {
   pauseSession(input: PauseSessionInput!): SessionInfo!
   startSession(input: StartSessionInput!): SessionInfo!
   updatePomodoroPrefs(input: UpdatePomodoroPrefsInput!): User!
+  updateTasksCompletedSessions(input: UpdateTasksCompletedSessionsInput!): [Task!]!
+  updateTasksCompletion(input: UpdateTasksCompletionInput!): [Task!]!
 }
 
 input PauseSessionInput {
@@ -108,6 +110,15 @@ input UpdatePomodoroPrefsInput {
   default_focus_minutes: Int
   default_long_break_minutes: Int
   long_break_every: Int
+}
+
+input UpdateTasksCompletedSessionsInput {
+  task_ids: [ID!]!
+}
+
+input UpdateTasksCompletionInput {
+  is_completed: Boolean!
+  task_ids: [ID!]!
 }
 
 type User {

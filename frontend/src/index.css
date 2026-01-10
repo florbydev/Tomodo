@@ -9,7 +9,12 @@
   --color-primary: #ffdea2;
   --color-primary-muted: #fff4df;
   --color-primary-hover: #fdfaf5;
+  --color-primary-selected: #f6ebd5;
   --color-secondary-hover: #dff4ff;
   --color-outline: #3c1e11;
   --font-inter: "Inter", system-ui, sans-serif;
+}
+
+button {
+  cursor: pointer;
 }

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import classNames from "classnames";
-
 import TomodoControlBar from "@/components/TomodoControlBar";
 import SessionPanel from "@/components/TomodoControlBar/SessionPanel";
 import TomodoTaskInput from "@/components/TomodoTaskInput";
@@ -32,41 +31,15 @@ function App() {
     }
   );
 
-  const faceBaseClass = classNames(
-    "flex",
-    "flex-col",
-    "gap-y-4.5",
-    "rounded-md",
-    "bg-white",
-    "p-6",
-    "border",
-    "border-[#3C1E11]",
-    "backface-hidden",
-    "[webkit-backface-visibility:hidden]",
-    "h-[456px]" // ✅ fixed height added
-  );
-
-  const frontFaceClass = classNames(
-    "relative",
-    faceBaseClass
-  );
-
-  const backFaceClass = classNames(
-    "absolute",
-    "inset-0",
-    "transform-[rotateY(180deg)]",
-    faceBaseClass
-  );
-
   return (
-    <main className="min-h-screen w-full flex bg-[#FFD8B5] font-inter">
+    <main className="min-h-screen w-full flex bg-[#FFD8B5] font-inter overflow-hidden">
       <div className="flex-1 flex items-center justify-center flex-col">
         <div className={sceneClass}>
           <div className={cardClass}>
             <TaskProvider>
 
               {/* FRONT */}
-              <div className={frontFaceClass}>
+              <div className='relative flex flex-col rounded-md p-6 gap-y-4.5 bg-white border border-[#3C1E11] backface-hidden [webkit-backface-visibility:hidden] h-136'>
                 <TomodoTaskInput />
                 <TomodoTaskList />
                 <TomodoControlBar
@@ -77,7 +50,7 @@ function App() {
               </div>
 
               {/* BACK */}
-              <div className={backFaceClass}>
+              <div className='absolute inset-0 transform-[rotateY(180deg)] inline-flex flex-col rounded-md pt-6 pb-10 bg-white border border-[#3C1E11] backface-hidden [webkit-backface-visibility:hidden] h-136'>
                 {flipped && (
                   <TomodoSessionScreen stopPomodoro={stopPomodoro} />
                 )}

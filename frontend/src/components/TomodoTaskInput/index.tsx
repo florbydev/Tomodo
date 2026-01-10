@@ -84,7 +84,7 @@ const TomodoTaskInput = (): JSX.Element => {
             }))
           }
           type='button'
-          className="inline-flex items-center justify-center gap-x-1 py-1 px-2 cursor-pointer"
+          className="inline-flex items-center justify-center gap-x-1 py-1 px-2 cursor-pointer transition-transform duration-175 ease-out hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span>{values.pomoCount}</span>
           <Pomo />

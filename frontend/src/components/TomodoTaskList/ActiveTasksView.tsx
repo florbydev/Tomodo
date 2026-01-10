@@ -1,6 +1,7 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
 import { ActiveListTaskItem } from "@/components/TomodoTaskList/ActiveListTaskItem";
 import type { TaskType } from "@/components/types";
+import FileIcon from "@/svgs/big-svgs/FileIcon";
 
 type Props = {
   activeTasks: Array<TaskType>;
@@ -21,22 +22,19 @@ const ActiveTasksView = ({ activeTasks, sessionTasks, setSessionTasks }: Props) 
     }
   }, [activeTasks]);
 
-  console.log('just checking');
 
 
-  return (
+  return (<>
     <ul
       ref={listRef}
       className="
-        max-h-64
+        max-h-76
         overflow-y-auto
         scroll-smooth
         pr-1
       "
     >
       {activeTasks.map((item) => {
-        console.log('sessionTasks', sessionTasks);
-
         const isChecked = sessionTasks.some(task => task.id === item.id)
 
         return (
@@ -45,11 +43,7 @@ const ActiveTasksView = ({ activeTasks, sessionTasks, setSessionTasks }: Props) 
             item={item}
             checked={isChecked}
             onCheckedChange={() => {
-              console.log('checking checkmark');
-
               if (isChecked) {
-                console.log('checked', isChecked, item.id);
-
                 (
                   setSessionTasks(prev => prev.filter((value) => value.id !== item.id))
                 );
@@ -61,6 +55,13 @@ const ActiveTasksView = ({ activeTasks, sessionTasks, setSessionTasks }: Props) 
         );
       })}
     </ul>
+    {
+      activeTasks.length <= 0 && <div className="flex-1 grow shrink-0 flex items-center justify-center flex-col gap-y-2">
+        <FileIcon />
+        <p className="text-sm font-light">No tasks at the moment.</p>
+      </div>
+    }
+  </>
   );
 };
 

@@ -5,7 +5,14 @@ import {
   CreateProjectInput,
   ProjectQuery,
 } from "./Project";
-import { Task, TaskQuery, TaskMutation, CreateTaskInput } from "./Task";
+import {
+  Task,
+  TaskQuery,
+  TaskMutation,
+  CreateTaskInput,
+  UpdateTasksCompletionInput,
+  UpdateTasksCompletedSessionsInput,
+} from "./Task";
 import {
   SessionInfo,
   SessionMutation,
@@ -29,7 +36,9 @@ export const graphqlTypes = [
   StartSessionInput,
   PauseSessionInput,
   EndSessionInput,
+  UpdateTasksCompletionInput,
   UpdatePomodoroPrefsInput,
+  UpdateTasksCompletedSessionsInput,
 
   // query/mutation extensions
   TaskQuery,

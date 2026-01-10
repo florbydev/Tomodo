@@ -1,14 +1,14 @@
 import { PastLogTaskItem } from "@/components/TomodoTaskList/PastLogTaskItem";
 import type { TaskType } from "@/components/types";
+import FileIcon from "@/svgs/big-svgs/FileIcon";
 import { useRef, useEffect } from "react";
 
 
 type Props = {
-  activeTasks: Array<TaskType>;
   pastLogs: Array<TaskType>;
 }
 
-const PastLogsView = ({ activeTasks, pastLogs }: Props) => {
+const PastLogsView = ({ pastLogs }: Props) => {
 
   const listRef = useRef<HTMLUListElement | null>(null);
 
@@ -19,12 +19,13 @@ const PastLogsView = ({ activeTasks, pastLogs }: Props) => {
         behavior: "smooth",
       });
     }
-  }, [activeTasks]);
-  return (
+  }, [pastLogs]);
+
+  return (<>
     <ul
       ref={listRef}
       className="
-        max-h-64
+        max-h-76
         overflow-y-auto
         scroll-smooth
         pr-1
@@ -32,16 +33,17 @@ const PastLogsView = ({ activeTasks, pastLogs }: Props) => {
     >
       {
         pastLogs.map(item => {
-          return <PastLogTaskItem item={item} onClick={(value: TaskType) => {
-            console.log('someValue', value);
-
-            // setActiveTasks([...activeTasks, value])
-            // setPastLogs(pastLogs.filter(e => e.id !== value.id))
-          }
-          } />
+          return <PastLogTaskItem item={item} />
         })
       }
     </ul>
+    {
+      pastLogs.length <= 0 && <div className="flex-1 grow shrink-0 flex items-center justify-center flex-col gap-y-2">
+        <FileIcon />
+        <p className="text-sm font-light">No tasks completed yet.</p>
+      </div>
+    }
+  </>
   )
 }
 

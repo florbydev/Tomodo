@@ -6,9 +6,9 @@ const ListView = () => {
   const { sessionTasks } = useTask();
   return (
     <div className="px-11.5 w-full flex items-center justify-center">
-      <div className="border border-outline bg-primary-muted p-4 w-full rounded-md">
-        <p className="font-medium text-sm mb-3 text-outline">Session Tasks</p>
-        <div className="overflow-auto max-h-40">
+      <div className="border border-outline bg-[#FEF7EA] p-4 w-full rounded-md">
+        <p className="font-medium text-sm mb-3 text-outline uppercase">Session Tasks</p>
+        <div className="overflow-auto max-h-24">
           <ul>
             {
               sessionTasks.map(task => {
